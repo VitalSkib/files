@@ -540,1155 +540,6 @@ if (-not $UserCustomizations) {
         Write-Log "Scripts directory already exists: $scriptsDir" "INFO"
     }
 
-    # ============================================================================
-    # WINDOWS APPS REMOVAL
-    # ============================================================================
-
-    # Create BloatRemoval.ps1 script
-    $bloatRemovalContent = @'
-<#
-  .SYNOPSIS
-      Removes Windows bloatware apps, legacy capabilities, and optional features from Windows 10/11 systems.
-
-  .DESCRIPTION
-      This script removes selected Windows components including:
-      - Appx packages (UWP apps like Calculator, Weather, etc.)
-      - Legacy Windows capabilities
-      - Optional Windows features
-      - Special apps requiring custom uninstall procedures (e.g., OneNote)
-
-      The script includes retry logic and verification to ensure complete removal.
-      This script is designed to run in any context: user sessions, SYSTEM account, or scheduled tasks.
-
-  .NOTES
-      Source: https://github.com/memstechtips/Winhance
-
-      Requirements:
-      - Windows 10/11
-      - Administrator privileges (script will auto-elevate)
-      - PowerShell 5.1 or higher
-#>
-
-# Check if script is running as Administrator
-If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
-    Try {
-        Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-        Exit
-    }
-    Catch {
-        Write-Host "Failed to run as Administrator. Please rerun with elevated privileges."
-        Exit
-    }
-}
-
-# Setup logging
-$logFolder = "C:\ProgramData\Winhance\Logs"
-$logFile = "$logFolder\BloatRemovalLog.txt"
-
-# Create log directory if it doesn't exist
-if (!(Test-Path $logFolder)) {
-    New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
-}
-
-# Function to write to log file
-function Write-Log {
-    param (
-        [string]$Message
-    )
-    
-    # Check if log file exists and is over 500KB (512000 bytes)
-    if ((Test-Path $logFile) -and (Get-Item $logFile).Length -gt 512000) {
-        Remove-Item $logFile -Force -ErrorAction SilentlyContinue
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        "$timestamp - Log rotated - previous log exceeded 500KB" | Out-File -FilePath $logFile
-    }
-    
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    "$timestamp - $Message" | Out-File -FilePath $logFile -Append
-    
-    # Also output to console for real-time progress
-    Write-Host $Message
-}
-Write-Log "Starting bloat removal process"
-
-# Enable Remove-AppX -AllUsers compatibility aliases for this session
-Write-Log "Setting up AppX compatibility aliases for this session..."
-try {
-    Set-Alias Get-AppPackageAutoUpdateSettings Get-AppxPackageAutoUpdateSettings -Scope Global -Force
-    Set-Alias Remove-AppPackageAutoUpdateSettings Remove-AppxPackageAutoUpdateSettings -Scope Global -Force
-    Set-Alias Set-AppPackageAutoUpdateSettings Set-AppxPackageAutoUpdateSettings -Scope Global -Force
-    Set-Alias Reset-AppPackage Reset-AppxPackage -Scope Global -Force
-    Set-Alias Add-MsixPackage Add-AppxPackage -Scope Global -Force
-    Set-Alias Get-MsixPackage Get-AppxPackage -Scope Global -Force
-    Set-Alias Remove-MsixPackage Remove-AppxPackage -Scope Global -Force
-    Write-Log "AppX compatibility aliases created successfully"
-} catch {
-    Write-Log "Warning: Could not create some AppX aliases: $($_.Exception.Message)"
-}
-
-# Packages to remove
-$packages = @(
-    'Microsoft.BingWeather'
-    'Microsoft.WindowsAlarms'
-    'Microsoft.WindowsCalculator'
-    'Microsoft.Windows.DevHome'
-    'Microsoft.WindowsFeedbackHub'
-    'Microsoft.WindowsTerminal'
-    'Microsoft.Windows.Photos'
-    'Microsoft.WindowsStore'
-    'Microsoft.Todos'
-)
-
-# Capabilities to remove
-$capabilities = @(
-)
-
-# Optional Features to disable
-$optionalFeatures = @(
-    'NetFx3'
-)
-
-# Special apps requiring uninstall string execution
-$specialApps = @(
-)
-
-$maxRetries = 3
-$retryCount = 0
-
-do {
-    $retryCount++
-    Write-Log "Standard removal attempt $retryCount of $maxRetries"
-
-    Write-Log "Discovering all packages..."
-    $allInstalledPackages = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue
-    $allProvisionedPackages = Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
-
-    Write-Log "Processing packages..."
-    $packagesToRemove = @()
-    $provisionedPackagesToRemove = @()
-    $notFoundPackages = @()
-
-    foreach ($package in $packages) {
-        $foundAny = $false
-
-        $installedPackages = $allInstalledPackages | Where-Object { $_.Name -eq $package }
-        if ($installedPackages) {
-            Write-Log "Found installed package: $package"
-            foreach ($pkg in $installedPackages) {
-                Write-Log "Queuing installed package for removal: $($pkg.PackageFullName)"
-                $packagesToRemove += $pkg.PackageFullName
-            }
-            $foundAny = $true
-        }
-
-        $provisionedPackages = $allProvisionedPackages | Where-Object { $_.DisplayName -eq $package }
-        if ($provisionedPackages) {
-            Write-Log "Found provisioned package: $package"
-            foreach ($pkg in $provisionedPackages) {
-                Write-Log "Queuing provisioned package for removal: $($pkg.PackageName)"
-                $provisionedPackagesToRemove += $pkg.PackageName
-            }
-            $foundAny = $true
-        }
-
-        if (-not $foundAny) {
-            $notFoundPackages += $package
-        }
-    }
-
-    if ($notFoundPackages.Count -gt 0) {
-        Write-Log "Packages not found: $($notFoundPackages -join ', ')"
-    }
-
-    if ($packagesToRemove.Count -gt 0) {
-        Write-Log "Removing $($packagesToRemove.Count) installed packages in batch..."
-        try {
-            $packagesToRemove | ForEach-Object {
-                Write-Log "Removing installed package: $_"
-                Remove-AppxPackage -Package $_ -AllUsers -ErrorAction SilentlyContinue
-            }
-            Write-Log "Batch removal of installed packages completed"
-        } catch {
-            Write-Log "Error in batch removal of installed packages: $($_.Exception.Message)"
-        }
-    }
-
-    if ($provisionedPackagesToRemove.Count -gt 0) {
-        Write-Log "Removing $($provisionedPackagesToRemove.Count) provisioned packages..."
-        foreach ($pkgName in $provisionedPackagesToRemove) {
-            try {
-                Write-Log "Removing provisioned package: $pkgName"
-                Remove-AppxProvisionedPackage -Online -PackageName $pkgName -ErrorAction SilentlyContinue
-            } catch {
-                Write-Log "Error removing provisioned package $pkgName : $($_.Exception.Message)"
-            }
-        }
-        Write-Log "Provisioned packages removal completed"
-    }
-
-    Write-Log "Processing capabilities..."
-    foreach ($capability in $capabilities) {
-        Write-Log "Checking capability: $capability"
-        try {
-            $matchingCapabilities = Get-WindowsCapability -Online | Where-Object { $_.Name -like "$capability*" -or $_.Name -like "$capability~~~~*" }
-
-            if ($matchingCapabilities) {
-                $foundInstalled = $false
-                foreach ($existingCapability in $matchingCapabilities) {
-                    if ($existingCapability.State -eq "Installed") {
-                        $foundInstalled = $true
-                        Write-Log "Removing capability: $($existingCapability.Name)"
-                        Remove-WindowsCapability -Online -Name $existingCapability.Name -ErrorAction SilentlyContinue | Out-Null
-                    }
-                }
-
-                if (-not $foundInstalled) {
-                    Write-Log "Found capability $capability but it is not installed"
-                }
-            }
-            else {
-                Write-Log "No matching capabilities found for: $capability"
-            }
-        }
-        catch {
-            Write-Log "Error checking capability: $capability - $($_.Exception.Message)"
-        }
-    }
-
-    Write-Log "Processing optional features..."
-    if ($optionalFeatures.Count -gt 0) {
-        $enabledFeatures = @()
-        foreach ($feature in $optionalFeatures) {
-            Write-Log "Checking feature: $feature"
-            $existingFeature = Get-WindowsOptionalFeature -Online -FeatureName $feature -ErrorAction SilentlyContinue
-            if ($existingFeature -and $existingFeature.State -eq "Enabled") {
-                $enabledFeatures += $feature
-            } else {
-                Write-Log "Feature not found or not enabled: $feature"
-            }
-        }
-
-        if ($enabledFeatures.Count -gt 0) {
-            Write-Log "Disabling features: $($enabledFeatures -join ', ')"
-            Disable-WindowsOptionalFeature -Online -FeatureName $enabledFeatures -NoRestart -ErrorAction SilentlyContinue | Out-Null
-        }
-    }
-
-    Write-Log "Verifying removal results..."
-    $remainingItems = @()
-
-    $currentPackages = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue
-    foreach ($package in $packages) {
-        if ($currentPackages | Where-Object { $_.Name -eq $package }) {
-            $remainingItems += $package
-            Write-Log "Package still installed: $package"
-        }
-    }
-
-    $currentCapabilities = Get-WindowsCapability -Online -ErrorAction SilentlyContinue | Where-Object State -eq 'Installed'
-    foreach ($capability in $capabilities) {
-        if ($currentCapabilities | Where-Object { $_.Name -like "$capability*" }) {
-            $remainingItems += $capability
-            Write-Log "Capability still installed: $capability"
-        }
-    }
-
-    $currentFeatures = Get-WindowsOptionalFeature -Online -ErrorAction SilentlyContinue | Where-Object State -eq 'Enabled'
-    foreach ($feature in $optionalFeatures) {
-        if ($currentFeatures | Where-Object { $_.FeatureName -eq $feature }) {
-            $remainingItems += $feature
-            Write-Log "Feature still enabled: $feature"
-        }
-    }
-
-    if ($remainingItems.Count -eq 0) {
-        Write-Log "All standard items successfully removed!"
-        break
-    } else {
-        Write-Log "Retry needed. $($remainingItems.Count) items remain: $($remainingItems -join ', ')"
-        if ($retryCount -lt $maxRetries) {
-            Write-Log "Waiting 2 seconds before retry..."
-            Start-Sleep -Seconds 2
-        }
-    }
-
-} while ($retryCount -lt $maxRetries -and $remainingItems.Count -gt 0)
-
-if ($remainingItems.Count -gt 0) {
-    Write-Log "Warning: $($remainingItems.Count) standard items could not be removed after $maxRetries attempts: $($remainingItems -join ', ')"
-}
-
-if ($specialApps.Count -gt 0) {
-    Write-Log "Processing special apps that require custom uninstall procedures..."
-
-    $maxSpecialRetries = 2
-    $specialRetryCount = 0
-    $specialAppsRemaining = @()
-
-    do {
-        $specialRetryCount++
-        if ($specialRetryCount -gt 1) {
-            Write-Log "Special apps retry attempt $specialRetryCount of $maxSpecialRetries"
-        }
-
-        $uninstallBasePaths = @(
-            'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
-            'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'
-        )
-
-        foreach ($specialApp in $specialApps) {
-            Write-Log "Processing special app: $specialApp"
-
-            switch ($specialApp) {
-                'OneNote' {
-                    $processesToStop = @('OneNote', 'ONENOTE', 'ONENOTEM')
-                    $searchPattern = 'OneNote*'
-                    $packagePattern = '*OneNote*'
-                }
-                default {
-                    Write-Log "Unknown or unsupported special app: $specialApp"
-                    continue
-                }
-            }
-
-            foreach ($processName in $processesToStop) {
-                $processes = Get-Process -Name $processName -ErrorAction SilentlyContinue
-                if ($processes) {
-                    $processes | Stop-Process -Force -ErrorAction SilentlyContinue
-                    Write-Log "Stopped process: $processName"
-                }
-            }
-
-            $uninstallExecuted = $false
-            foreach ($uninstallBasePath in $uninstallBasePaths) {
-                try {
-                    Write-Log "Searching for $searchPattern in $uninstallBasePath"
-                    $uninstallKeys = Get-ChildItem -Path $uninstallBasePath -ErrorAction SilentlyContinue |
-                                    Where-Object { $_.PSChildName -like $searchPattern }
-
-                    foreach ($key in $uninstallKeys) {
-                        try {
-                            $uninstallString = (Get-ItemProperty -Path $key.PSPath -ErrorAction SilentlyContinue).UninstallString
-                            if ($uninstallString) {
-                                Write-Log "Found uninstall string: $uninstallString"
-
-                                if ($uninstallString -match '^\"([^\"]+)\"(.*)$') {
-                                    $exePath = $matches[1]
-                                    $args = $matches[2].Trim()
-
-                                    if ($exePath -like '*OfficeClickToRun.exe') {
-                                        $args += ' DisplayLevel=False'
-                                    } else {
-                                        $args += ' /silent'
-                                    }
-
-                                    Write-Log "Executing: $exePath with args: $args"
-                                    Start-Process -FilePath $exePath -ArgumentList $args -NoNewWindow -Wait -ErrorAction SilentlyContinue
-                                } else {
-                                    if ($uninstallString -like '*OfficeClickToRun.exe*') {
-                                        Start-Process -FilePath $uninstallString -ArgumentList 'DisplayLevel=False' -NoNewWindow -Wait -ErrorAction SilentlyContinue
-                                    } else {
-                                        Start-Process -FilePath $uninstallString -ArgumentList '/silent' -NoNewWindow -Wait -ErrorAction SilentlyContinue
-                                    }
-                                }
-
-                                $uninstallExecuted = $true
-                                Write-Log "Completed uninstall execution for $specialApp"
-                            }
-                        }
-                        catch {
-                            Write-Log "Error processing uninstall key: $($_.Exception.Message)"
-                        }
-                    }
-                }
-                catch {
-                    Write-Log "Error searching for uninstall keys: $($_.Exception.Message)"
-                }
-            }
-
-            if (-not $uninstallExecuted) {
-                Write-Log "No uninstall strings found for $specialApp"
-            }
-        }
-
-        if ($specialRetryCount -eq 1) {
-            Write-Log "Waiting 3 seconds for uninstallers to complete..."
-            Start-Sleep -Seconds 3
-        }
-
-        Write-Log "Verifying special apps removal..."
-        $specialAppsRemaining = @()
-
-        foreach ($specialApp in $specialApps) {
-            $stillExists = $false
-
-            switch ($specialApp) {
-                'OneNote' {
-                    $appxPackage = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue |
-                                   Where-Object { $_.Name -like '*OneNote*' }
-                    if ($appxPackage) {
-                        $stillExists = $true
-                        Write-Log "OneNote AppxPackage still exists: $($appxPackage.PackageFullName)"
-                    }
-
-                    $uninstallKeys = Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall' -ErrorAction SilentlyContinue |
-                                     Where-Object { $_.PSChildName -like 'OneNote*' }
-                    if ($uninstallKeys) {
-                        $stillExists = $true
-                        Write-Log "OneNote registry uninstall keys still exist"
-                    }
-                }
-            }
-
-            if ($stillExists) {
-                $specialAppsRemaining += $specialApp
-            }
-        }
-
-        if ($specialAppsRemaining.Count -eq 0) {
-            Write-Log "All special apps successfully removed!"
-            break
-        } else {
-            Write-Log "$($specialAppsRemaining.Count) special apps remain: $($specialAppsRemaining -join ', ')"
-            if ($specialRetryCount -lt $maxSpecialRetries) {
-                Write-Log "Waiting 3 seconds before retry..."
-                Start-Sleep -Seconds 3
-            }
-        }
-
-    } while ($specialRetryCount -lt $maxSpecialRetries -and $specialAppsRemaining.Count -gt 0)
-
-    if ($specialAppsRemaining.Count -gt 0) {
-        Write-Log "Warning: $($specialAppsRemaining.Count) special apps could not be removed after $maxSpecialRetries attempts: $($specialAppsRemaining -join ', ')"
-    }
-}
-
-Write-Log "Bloat removal process completed"
-'@
-
-    $bloatRemovalPath = Join-Path $scriptsDir "BloatRemoval.ps1"
-    try {
-        $bloatRemovalContent | Out-File -FilePath $bloatRemovalPath -Encoding UTF8 -Force
-        Write-Log "Created: BloatRemoval.ps1" "SUCCESS"
-    } catch {
-        Write-Log "Failed to create BloatRemoval.ps1: $($_.Exception.Message)" "ERROR"
-    }
-
-    # Create EdgeRemoval.ps1 script
-    $edgeRemovalContent = @'
-
-<#
-  .SYNOPSIS
-      Removes Microsoft Edge (Legacy and Chromium versions) from Windows 10/11 systems.
-      Script Version: 1.0
-
-  .DESCRIPTION
-      This script detects and removes Microsoft Edge installations including:
-      - Legacy UWP Edge (pre-Chromium)
-      - Chromium-based Edge (current version)
-      - EdgeUpdate components
-      - EdgeWebView2 is NOT removed
-
-      This script is designed to run in any context: user sessions, SYSTEM account, or scheduled tasks.
-
-  .NOTES
-      Source: https://github.com/memstechtips/Winhance
-
-      Requirements:
-      - Windows 10/11
-      - Administrator privileges (script will auto-elevate)
-      - PowerShell 5.1 or higher
-
-      Credits:
-      - Legacy Edge removal based on work by ishad0w: https://gist.github.com/ishad0w/d25ca52eb04dbefba8087a344a69c79c
-      - Chromium Edge removal based on work by FR33THY: https://github.com/FR33THYFR33THY/Ultimate-Windows-Optimization-Guide/blob/main/6%20Windows/14%20Edge.ps1
-      - Edge protocol redirect based on OpenWebSearch by AveYo: https://github.com/AveYo/fox/blob/main/OpenWebSearch.cmd
-#>
-
-# Check if script is running as Administrator
-If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
-    Try {
-        Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-        Exit
-    }
-    Catch {
-        Write-Host "Failed to run as Administrator. Please rerun with elevated privileges."
-        Exit
-    }
-}
-
-# Setup logging
-$logFolder = "C:\ProgramData\Winhance\Logs"
-$logFile = "$logFolder\EdgeRemovalLog.txt"
-
-# Create log directory if it doesn't exist
-if (!(Test-Path $logFolder)) {
-    New-Item -ItemType Directory -Path $logFolder -Force | Out-Null
-}
-
-# Function to write to log file
-function Write-Log {
-    param (
-        [string]$Message
-    )
-
-    # Check if log file exists and is over 500KB (512000 bytes)
-    if ((Test-Path $logFile) -and (Get-Item $logFile).Length -gt 512000) {
-        Remove-Item $logFile -Force -ErrorAction SilentlyContinue
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        "$timestamp - Log rotated - previous log exceeded 500KB" | Out-File -FilePath $logFile
-    }
-
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    "$timestamp - $Message" | Out-File -FilePath $logFile -Append
-
-    # Also output to console for real-time progress
-    Write-Host $Message
-}
-
-# Helper function to get Legacy Edge packages
-function Get-LegacyEdgePackages {
-    $legacyRegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages"
-    return Get-ChildItem -Path $legacyRegPath -Name -ErrorAction SilentlyContinue | Where-Object { $_ -match "Microsoft-Windows-Internet-Browser-Package" -and $_ -match "~~" }
-}
-
-# Function to test if Legacy Edge is installed
-function Test-LegacyEdgeInstalled {
-    $packages = Get-LegacyEdgePackages
-
-    if ($packages) {
-        foreach ($package in $packages) {
-            $packageInfo = & dism /online /Get-PackageInfo /PackageName:$package 2>$null
-            if ($packageInfo -match "State.*Installed") {
-                return $true
-            }
-        }
-    }
-    return $false
-}
-
-# Function to test if Chromium Edge is installed
-function Test-ChromiumEdgeInstalled {
-    # Check folders first (fastest)
-    $edgeFolders = @("Edge", "EdgeCore", "EdgeUpdate")
-    $programFiles = @($env:ProgramFiles, ${env:ProgramFiles(x86)})
-
-    foreach ($pf in $programFiles) {
-        foreach ($folder in $edgeFolders) {
-            if (Test-Path "$pf\Microsoft\$folder") {
-                return $true
-            }
-        }
-    }
-
-    # Fallback: Check installed programs
-    try {
-        $edgeApp = Get-WmiObject -Class Win32_InstalledStoreProgram -Filter "Name like '%Microsoft.MicrosoftEdge.Stable%'" -ErrorAction SilentlyContinue
-        return $edgeApp -ne $null
-    } catch {
-        return $false
-    }
-}
-
-# Function to stop Edge-related processes
-function Stop-EdgeProcesses {
-    Write-Log "Stopping Edge-related processes and services"
-    $stop = "MicrosoftEdgeUpdate", "OneDrive", "WidgetService", "Widgets", "msedge", "Resume", "CrossDeviceResume", "msedgewebview2"
-    $stop | ForEach-Object {
-        $processCount = (Get-Process -Name $_ -ErrorAction SilentlyContinue).Count
-        if ($processCount -gt 0) {
-            Stop-Process -Name $_ -Force -ErrorAction SilentlyContinue
-            Write-Log "Stopped $processCount instance(s) of $_"
-        }
-    }
-}
-
-# Function to remove Legacy Edge
-function Remove-LegacyEdge {
-    Write-Log "Starting Legacy Edge/UWP Edge removal process"
-    # Query registry for Edge Legacy package
-    $packages = Get-LegacyEdgePackages
-    $edgeLegacyPackageVersion = $packages | Select-Object -First 1
-    $packagePath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\Packages\$edgeLegacyPackageVersion"
-    # Set registry visibility
-    Set-ItemProperty -Path $packagePath -Name "Visibility" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue
-    # Remove owners registry entries
-    $ownersPath = "$packagePath\Owners"
-    if (Test-Path $ownersPath) { Remove-Item -Path $ownersPath -Recurse -Force -ErrorAction SilentlyContinue }
-    Write-Log "Removing Legacy Edge package via DISM (with 30-second timeout)"
-    $dismProcess = Start-Process -FilePath "dism.exe" -ArgumentList "/online", "/Remove-Package", "/PackageName:$edgeLegacyPackageVersion" -NoNewWindow -PassThru
-
-    if ($dismProcess -and $dismProcess.WaitForExit(30000)) {
-        Write-Log "DISM completed successfully"
-    } elseif ($dismProcess) {
-        Write-Log "DISM timed out after 30 seconds, killing process and retrying once"
-        $dismProcess.Kill()
-        Start-Sleep 2
-
-        # Retry once
-        Write-Log "Retrying DISM command"
-        $retryProcess = Start-Process -FilePath "dism.exe" -ArgumentList "/online", "/Remove-Package", "/PackageName:$edgeLegacyPackageVersion" -NoNewWindow -PassThru
-
-        if ($retryProcess -and $retryProcess.WaitForExit(30000)) {
-            Write-Log "DISM retry completed successfully"
-        } elseif ($retryProcess) {
-            Write-Log "DISM retry also timed out, continuing with script"
-            $retryProcess.Kill()
-        } else {
-            Write-Log "DISM retry failed to start, continuing with script"
-        }
-    } else {
-        Write-Log "DISM failed to start, continuing with script"
-    }
-    # Remove Legacy UWP Edge package
-    Write-Log "Removing Legacy UWP Edge package"
-    Get-AppxPackage -AllUsers Microsoft.MicrosoftEdge | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Out-Null
-    Write-Log "Legacy Edge/UWP Edge removal process completed"
-}
-
-# Function to remove Edge shortcuts
-function Remove-EdgeShortcuts {
-    Write-Log "Starting Edge shortcuts cleanup"
-
-    # Get ALL user profiles (no exclusions)
-    $userProfiles = Get-ChildItem -Path "C:\Users" -Directory | Where-Object {
-        (Test-Path -Path "$($_.FullName)\NTUSER.DAT")
-    }
-
-    # Build all shortcut paths to check
-    $shortcutPaths = @()
-
-    # Add user-specific paths (now includes Public, Default, etc.)
-    foreach ($profile in $userProfiles) {
-        $shortcutPaths += @(
-            "$($profile.FullName)\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\Microsoft Edge.lnk",
-            "$($profile.FullName)\Desktop\Microsoft Edge.lnk",
-            "$($profile.FullName)\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Microsoft Edge.lnk",
-            "$($profile.FullName)\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Tombstones\Microsoft Edge.lnk",
-            "$($profile.FullName)\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
-        )
-    }
-
-    # Add the single ProgramData path
-    $shortcutPaths += "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
-
-    # Remove all shortcuts in one loop
-    $removedCount = 0
-    foreach ($path in $shortcutPaths) {
-        if (Test-Path -Path $path -PathType Leaf) {
-            Remove-Item -Path $path -Force -ErrorAction SilentlyContinue
-            $removedCount++
-        }
-    }
-
-    Write-Log "Removed $removedCount Edge shortcut(s)"
-}
-
-function Install-EdgeProtocolRedirect {
-    Write-Log "Checking if Edge protocol redirect is needed"
-
-    $ifeoCheck = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\ie_to_edge_stub.exe\0"
-    if (Test-Path $ifeoCheck) {
-        $debugger = (Get-ItemProperty -Path $ifeoCheck -Name "Debugger" -ErrorAction SilentlyContinue).Debugger
-        if ($debugger -like "*OpenWebSearch*") {
-            Write-Log "Edge protocol redirect already installed"
-            return
-        }
-    }
-
-    Write-Log "Installing Edge protocol redirect using OpenWebSearch"
-    $scriptsDir = "C:\ProgramData\Winhance\OpenWebSearch"
-    New-Item -ItemType Directory -Path $scriptsDir -Force -ErrorAction SilentlyContinue | Out-Null
-
-    $stubTargetPath = "$scriptsDir\ie_to_edge_stub.exe"
-    if (!(Test-Path $stubTargetPath)) {
-        Write-Log "Warning: ie_to_edge_stub.exe not found at $stubTargetPath (should have been copied before Edge removal)"
-        return
-    }
-
-    $openWebSearchContent = @"
-@title OpenWebSearch 2023 & echo off
-for /f %%E in ('"prompt `$E`$S& for %%e in (1) do rem"') do echo;%%E[2t 2>nul
-
-call :reg_var "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice" ProgID ProgID
-if /i "%ProgID%" equ "MSEdgeHTM" exit /b
-
-call :reg_var "HKCR\%ProgID%\shell\open\command" "" Browser
-set Choice=& for %%. in (%Browser%) do if not defined Choice set "Choice=%%~."
-
-call :reg_var "HKCR\MSEdgeMHT\shell\open\command" "" FallBack
-set "Edge=" & for %%. in (%FallBack%) do if not defined Edge set "Edge=%%~."
-set "URI=" & set "URL=" & set "NOOP=" & set "PassTrough=%Edge:msedge=edge%"
-
-set "CLI=%CMDCMDLINE:"=````%"
-if defined CLI set "CLI=%CLI:*ie_to_edge_stub.exe```` =%"
-if defined CLI set "CLI=%CLI:*ie_to_edge_stub.exe =%"
-if defined CLI set "CLI=%CLI:*msedge.exe```` =%"
-if defined CLI set "CLI=%CLI:*msedge.exe =%"
-set "FIX=%CLI:~-1%"
-if defined CLI if "%FIX%"==" " set "CLI=%CLI:~0,-1%"
-if defined CLI set "RED=%CLI:microsoft-edge=%"
-if defined CLI set "URL=%CLI:http=%"
-if defined CLI set "ARG=%CLI:````="%"
-
-if "%CLI%" equ "%RED%" (set NOOP=1) else if "%CLI%" equ "%URL%" (set NOOP=1)
-if defined NOOP if not exist "%PassTrough%" echo;@mklink /h "%PassTrough%" "%Edge%" >"%Temp%\OpenWebSearchRepair.cmd"
-if defined NOOP if not exist "%PassTrough%" schtasks /run /tn OpenWebSearchRepair 2>nul >nul
-if defined NOOP if not exist "%PassTrough%" timeout /t 3 >nul
-if defined NOOP if exist "%PassTrough%" start "" "%PassTrough%" %ARG%
-if defined NOOP exit /b
-
-set "URL=%CLI:*microsoft-edge=%"
-set "URL=http%URL:*http=%"
-set "FIX=%URL:~-2%"
-if defined URL if "%FIX%"=="````" set "URL=%URL:~0,-2%"
-call :dec_url
-start "" "%Choice%" "%URL%"
-exit
-
-:reg_var
-set {var}=& set {reg}=reg query "%~1" /v %2 /z /se "," /f /e& if %2=="" set {reg}=reg query "%~1" /ve /z /se "," /f /e
-for /f "skip=2 tokens=* delims=" %%V in ('%{reg}% %4 %5 %6 %7 %8 %9 2^>nul') do if not defined {var} set "{var}=%%V"
-if not defined {var} (set {reg}=& set "%~3="& exit /b) else if %2=="" set "{var}=%{var}:*)    =%"
-if not defined {var} (set {reg}=& set "%~3="& exit /b) else set {reg}=& set "%~3=%{var}:*)    =%"& set {var}=& exit /b
-
-:dec_url
-set ".=%URL:!=}%" & setlocal enabledelayedexpansion
-set ".=!.:%%={!" &set ".=!.:{3A=:!" &set ".=!.:{2F=/!" &set ".=!.:{3F=?!" &set ".=!.:{23=#!" &set ".=!.:{5B=[!" &set ".=!.:{5D=]!"
-set ".=!.:{40=@!"&set ".=!.:{21=}!" &set ".=!.:{24=`$!" &set ".=!.:{26=&!" &set ".=!.:{27='!" &set ".=!.:{28=(!" &set ".=!.:{29=)!"
-set ".=!.:{2A=*!"&set ".=!.:{2B=+!" &set ".=!.:{2C=,!" &set ".=!.:{3B=;!" &set ".=!.:{3D==!" &set ".=!.:{25=%%!"&set ".=!.:{20= !"
-set ".=!.:{=%%!" & endlocal& set "URL=%.:}=!%" & exit /b
-"@
-
-    $openWebSearchPath = "$scriptsDir\OpenWebSearch.cmd"
-    $openWebSearchContent | Out-File -FilePath $openWebSearchPath -Encoding ASCII -Force
-    Write-Log "Created OpenWebSearch.cmd at $openWebSearchPath"
-
-    $msedgePath = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe"
-    $edgePath = "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\edge.exe"
-    if ((Test-Path $msedgePath) -and !(Test-Path $edgePath)) {
-        cmd /c mklink /h "$edgePath" "$msedgePath" 2>&1 | Out-Null
-        Write-Log "Created edge.exe hardlink at $edgePath"
-    }
-
-    $buildNumber = [Environment]::OSVersion.Version.Build
-    $conhostFlags = if ($buildNumber -gt 25179) { "--width 1 --height 1" } else { "--headless" }
-    $conhostDebugger = "$env:SystemRoot\system32\conhost.exe $conhostFlags $scriptsDir\OpenWebSearch.cmd"
-
-    Write-Log "Configuring registry entries for Edge protocol redirect"
-    reg.exe add "HKCR\microsoft-edge" /f /ve /d "URL:microsoft-edge" 2>&1 | Out-Null
-    reg.exe add "HKCR\microsoft-edge" /f /v "URL Protocol" /d `"`" 2>&1 | Out-Null
-    reg.exe add "HKCR\microsoft-edge" /f /v "NoOpenWith" /d `"`" 2>&1 | Out-Null
-    reg.exe add "HKCR\microsoft-edge\shell\open\command" /f /ve /d "$stubTargetPath %1" 2>&1 | Out-Null
-    reg.exe add "HKCR\MSEdgeHTM" /f /v "NoOpenWith" /d `"`" 2>&1 | Out-Null
-    reg.exe add "HKCR\MSEdgeHTM\shell\open\command" /f /ve /d "$stubTargetPath %1" 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\ie_to_edge_stub.exe" /f /v UseFilter /d 1 /t reg_dword 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\ie_to_edge_stub.exe\0" /f /v FilterFullPath /d "$stubTargetPath" 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\ie_to_edge_stub.exe\0" /f /v Debugger /d "$conhostDebugger" 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe" /f /v UseFilter /d 1 /t reg_dword 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe\0" /f /v FilterFullPath /d "$msedgePath" 2>&1 | Out-Null
-    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\msedge.exe\0" /f /v Debugger /d "$conhostDebugger" 2>&1 | Out-Null
-    Write-Log "Registry configuration completed"
-
-    $repairScriptPath = "$scriptsDir\OpenWebSearchRepair.cmd"
-    $repairScriptContent = "@echo off`r`nmklink /h ""$edgePath"" ""$msedgePath"""
-    $repairScriptContent | Out-File -FilePath $repairScriptPath -Encoding ASCII -Force
-    Write-Log "Created repair script at $repairScriptPath"
-
-    Write-Log "Creating OpenWebSearchRepair scheduled task"
-    try {
-        $taskAction = New-ScheduledTaskAction -Execute $repairScriptPath
-        $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date
-        $taskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-        Register-ScheduledTask -TaskName 'OpenWebSearchRepair' -Action $taskAction -Trigger $taskTrigger -Settings $taskSettings -RunLevel Highest -Force | Out-Null
-        Write-Log "OpenWebSearchRepair scheduled task created"
-    } catch {
-        Write-Log "Failed to create OpenWebSearchRepair scheduled task: $($_.Exception.Message)"
-    }
-}
-
-# Function to remove Chromium Edge and EdgeUpdate
-function Remove-ChromiumEdge {
-    # Remove Chromium Edge
-    Write-Log "Starting Edge Chromium uninstallation process"
-    # Folder and file to allow uninstall of Edge Chromium Browser
-    Write-Log "Creating temporary directory for Edge uninstallation"
-    $edgePath = "$env:SystemRoot\SystemApps\Microsoft.MicrosoftEdge_8wekyb3d8bbwe"
-    New-Item -Path $edgePath -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-    New-Item -Path $edgePath -ItemType File -Name "MicrosoftEdge.exe" -ErrorAction SilentlyContinue | Out-Null
-    # Get Edge Uninstall Strings for Enterprise MSI version or normal version (they require different handling)
-    Write-Log "Searching for Edge uninstall strings in registry"
-    $uninstallKeys = Get-ChildItem "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-    $edgeUninstallCount = 0
-    foreach ($key in $uninstallKeys) {
-        $displayName = (Get-ItemProperty $key.PSPath -ErrorAction SilentlyContinue).DisplayName
-        if ($displayName -like "*Microsoft Edge*") {
-            $uninstallString = (Get-ItemProperty $key.PSPath).UninstallString
-            if ($uninstallString) {
-                $edgeUninstallCount++
-                if ($uninstallString -like "*msiexec*") {
-                    # Uninstalls Enterprise MSI version
-                    Write-Log "Executing MSI uninstaller for Edge"
-                    Start-Process cmd.exe "/c $uninstallString /quiet" -WindowStyle Hidden -Wait | Out-Null
-                } else {
-                    # Uninstalls normal version
-                    Write-Log "Executing standard uninstaller for Edge"
-                    Start-Process cmd.exe "/c $uninstallString --force-uninstall --silent" -WindowStyle Hidden -Wait | Out-Null
-                }
-            }
-        }
-    }
-    if ($edgeUninstallCount -eq 0) {
-        Write-Log "No Edge uninstall entries found in registry"
-    } else {
-        Write-Log "Executed $edgeUninstallCount Edge uninstaller(s)"
-    }
-    # Remove UWP Edge Chromium package
-    Write-Log "Removing UWP Edge Chromium package"
-    Get-AppxPackage -AllUsers Microsoft.MicrosoftEdge.Stable | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Out-Null
-    # Cleanup: Remove folder and file we created earlier
-    Write-Log "Cleaning up temporary Edge directory"
-    Remove-Item -Recurse -Force $edgePath -ErrorAction SilentlyContinue | Out-Null
-    Write-Log "Edge Chromium uninstallation process completed"
-
-    # Remove EdgeUpdate
-    Write-Log "Starting EdgeUpdate removal process"
-    # Find EdgeUpdate executables
-    Write-Log "Searching for EdgeUpdate executables"
-    $edgeupdate = @()
-    $searchPaths = @("LocalApplicationData", "ProgramFilesX86", "ProgramFiles")
-    foreach ($pathType in $searchPaths) {
-        $folder = [Environment]::GetFolderPath($pathType)
-        $searchPattern = "$folder\Microsoft\EdgeUpdate\*.*.*.*\MicrosoftEdgeUpdate.exe"
-        $foundFiles = Get-ChildItem $searchPattern -Recurse -ErrorAction SilentlyContinue
-        if ($foundFiles) {
-            $edgeupdate += $foundFiles.FullName
-        }
-    }
-    if ($edgeupdate.Count -gt 0) {
-        Write-Log "Found $($edgeupdate.Count) EdgeUpdate executable(s)"
-    } else {
-        Write-Log "No EdgeUpdate executables found"
-    }
-    # Backup ClientState registry if it exists (important, or else webview won't work)
-    $backupRegFile = "$env:TEMP\EdgeUpdate_ClientState_Backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').reg"
-    $clientStatePath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\ClientState"
-    if (Test-Path $clientStatePath) {
-        Write-Log "Backing up EdgeUpdate ClientState registry"
-        cmd /c "reg export `"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\ClientState`" `"$backupRegFile`" /y" 2>$null
-        if (Test-Path $backupRegFile) {
-            Write-Log "Successfully created registry backup at $backupRegFile"
-        } else {
-            Write-Log "Warning: Failed to create registry backup"
-        }
-    } else {
-        Write-Log "No EdgeUpdate ClientState registry found to backup"
-    }
-    # Uninstall EdgeUpdate executables
-    Write-Log "Processing EdgeUpdate uninstallation"
-    foreach ($path in $edgeupdate) {
-        if (Test-Path $path) {
-            # Unregister service
-            Write-Log "Unregistering EdgeUpdate service from $path"
-            Start-Process -FilePath $path -ArgumentList "/unregsvc" -Wait -WindowStyle Hidden -ErrorAction SilentlyContinue
-            # Wait for processes to finish
-            $waitCount = 0
-            do {
-                Start-Sleep 3
-                $runningProcesses = Get-Process -Name "setup", "MicrosoftEdge*" -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*\Microsoft\Edge*" }
-            } while ($runningProcesses -and $waitCount++ -lt 20)
-            # Run uninstall if file still exists
-            if (Test-Path $path) {
-                Write-Log "Running EdgeUpdate uninstaller from $path"
-                Start-Process -FilePath $path -ArgumentList "/uninstall" -Wait -WindowStyle Hidden -ErrorAction SilentlyContinue
-            }
-        }
-    }
-    # Restore ClientState backup
-    if ((Test-Path $backupRegFile)) {
-        Write-Log "Restoring EdgeUpdate ClientState registry from backup"
-        cmd /c "reg import `"$backupRegFile`"" 2>$null
-        Remove-Item $backupRegFile -ErrorAction SilentlyContinue
-        Write-Log "Registry restore completed and backup file cleaned up"
-    } else {
-        Write-Log "No registry backup file found to restore"
-    }
-    Write-Log "EdgeUpdate removal process completed"
-}
-
-function Remove-EdgeRegistryKeys {
-    Write-Log "Starting comprehensive Edge registry cleanup"
-
-    $directPaths = @(
-        "HKLM:\SOFTWARE\Microsoft\Edge",
-        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Edge",
-        "HKCU:\Software\Microsoft\Edge",
-        "HKCU:\Software\Microsoft\EdgeUpdate",
-        "HKLM:\SOFTWARE\Clients\StartMenuInternet\Microsoft Edge",
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe",
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MicrosoftEdge",
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge",
-        "HKLM:\SYSTEM\CurrentControlSet\Services\Eventlog\Application\Edge",
-        "HKLM:\SYSTEM\CurrentControlSet\Services\Eventlog\Application\edgeupdate",
-        "HKLM:\SYSTEM\CurrentControlSet\Services\Eventlog\Application\edgeupdatem"
-    )
-
-    $removedCount = 0
-    foreach ($path in $directPaths) {
-        if (Test-Path $path) {
-            Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
-            $removedCount++
-        }
-    }
-    Write-Log "Removed $removedCount direct registry key(s)"
-
-    $valuesToRemove = @(
-        @{Path = "HKLM:\SOFTWARE\RegisteredApplications"; Name = "Microsoft Edge"},
-        @{Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppLaunch"; Name = "MSEdge"},
-        @{Path = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"; Name = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"}
-    )
-
-    $removedValuesCount = 0
-    foreach ($item in $valuesToRemove) {
-        if ((Test-Path $item.Path) -and (Get-ItemProperty -Path $item.Path -Name $item.Name -ErrorAction SilentlyContinue)) {
-            Remove-ItemProperty -Path $item.Path -Name $item.Name -Force -ErrorAction SilentlyContinue
-            $removedValuesCount++
-        }
-    }
-    Write-Log "Removed $removedValuesCount registry value(s)"
-
-    $patterns = @(
-        @{Root = "HKLM:\SOFTWARE\Classes"; Pattern = "microsoft-edge"},
-        @{Root = "HKLM:\SOFTWARE\Classes"; Pattern = "MicrosoftEdgeUpdate*"},
-        @{Root = "HKLM:\SOFTWARE\Classes"; Pattern = "MSEdge*"},
-        @{Root = "HKLM:\SOFTWARE\Classes\WOW6432Node"; Pattern = "MicrosoftEdgeUpdate*"},
-        @{Root = "HKLM:\SOFTWARE\WOW6432Node\Classes"; Pattern = "MicrosoftEdgeUpdate*"}
-    )
-
-    $removedPatternCount = 0
-    foreach ($patternItem in $patterns) {
-        if (Test-Path $patternItem.Root) {
-            $matchedKeys = Get-ChildItem -Path $patternItem.Root -ErrorAction SilentlyContinue |
-                Where-Object { $_.PSChildName -like $patternItem.Pattern }
-
-            foreach ($key in $matchedKeys) {
-                Remove-Item $key.PSPath -Recurse -Force -ErrorAction SilentlyContinue
-                $removedPatternCount++
-            }
-        }
-    }
-    Write-Log "Removed $removedPatternCount pattern-matched key(s)"
-
-    $muiCachePath = "HKCU:\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"
-    if (Test-Path $muiCachePath) {
-        $properties = Get-ItemProperty -Path $muiCachePath -ErrorAction SilentlyContinue
-        $removedMuiCount = 0
-        if ($properties) {
-            foreach ($prop in $properties.PSObject.Properties) {
-                if ($prop.Name -like "*Edge*" -or $prop.Name -like "*EdgeUpdate*") {
-                    Remove-ItemProperty -Path $muiCachePath -Name $prop.Name -Force -ErrorAction SilentlyContinue
-                    $removedMuiCount++
-                }
-            }
-        }
-        Write-Log "Removed $removedMuiCount MuiCache entry(ies)"
-    }
-}
-
-function Remove-AdditionalEdgeFolders {
-    Write-Log "Starting additional Edge folder cleanup"
-
-    $systemPaths = @(
-        "C:\ProgramData\Microsoft\EdgeUpdate",
-        "C:\Windows\Temp\MsEdgeCrashpad"
-    )
-
-    $removedCount = 0
-    foreach ($path in $systemPaths) {
-        if (Test-Path $path) {
-            Write-Log "Removing: $path"
-            Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
-            $removedCount++
-        }
-    }
-
-    $userProfiles = Get-ChildItem -Path "C:\Users" -Directory -ErrorAction SilentlyContinue |
-        Where-Object { Test-Path "$($_.FullName)\NTUSER.DAT" }
-
-    foreach ($profile in $userProfiles) {
-        $edgeLocalPath = "$($profile.FullName)\AppData\Local\Microsoft\Edge"
-        if (Test-Path $edgeLocalPath) {
-            Write-Log "Removing: $edgeLocalPath"
-            Remove-Item $edgeLocalPath -Recurse -Force -ErrorAction SilentlyContinue
-            $removedCount++
-        }
-    }
-
-    Write-Log "Removed $removedCount additional Edge folder(s)"
-}
-
-Write-Host "Starting Edge removal process. See $logFile for details."
-
-# Check for Edge installations first
-Write-Log "Checking for Edge installations..."
-
-$legacyInstalled = Test-LegacyEdgeInstalled
-$chromiumInstalled = Test-ChromiumEdgeInstalled
-
-if (-not $legacyInstalled -and -not $chromiumInstalled) {
-    Write-Log "No Edge installations detected. Exiting."
-    Write-Host "No Edge installations found. Script exiting."
-    exit 0
-}
-
-$removedSomething = $false
-$stubPath = $null
-
-if ($chromiumInstalled) {
-    Write-Log "Chromium Edge detected. Finding ie_to_edge_stub.exe before removal."
-
-    $stubLocations = @("$env:ProgramData\ie_to_edge_stub.exe", "$env:Public\ie_to_edge_stub.exe")
-    foreach ($loc in $stubLocations) {
-        if (Test-Path $loc) {
-            $stubPath = $loc
-            Write-Log "Found stub at: $loc"
-            break
-        }
-    }
-
-    if (!$stubPath) {
-        $stubSearch = Get-ChildItem "${env:ProgramFiles(x86)}\Microsoft\Edge" -Filter "ie_to_edge_stub.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($stubSearch) {
-            $stubPath = $stubSearch.FullName
-            Write-Log "Found stub at: $stubPath"
-        } else {
-            Write-Log "ie_to_edge_stub.exe not found in any location"
-        }
-    }
-
-    if ($stubPath) {
-        $scriptsDir = "C:\ProgramData\Winhance\OpenWebSearch"
-        New-Item -ItemType Directory -Path $scriptsDir -Force -ErrorAction SilentlyContinue | Out-Null
-        Copy-Item $stubPath "$scriptsDir\ie_to_edge_stub.exe" -Force -ErrorAction SilentlyContinue
-        Write-Log "Copied ie_to_edge_stub.exe to $scriptsDir before Edge removal"
-    }
-}
-
-if ($legacyInstalled) {
-    Write-Log "Legacy Edge detected. Proceeding with removal."
-    Stop-EdgeProcesses
-    Remove-LegacyEdge
-    $removedSomething = $true
-}
-
-if ($chromiumInstalled) {
-    Write-Log "Chromium Edge detected. Proceeding with removal."
-    Stop-EdgeProcesses
-    Remove-ChromiumEdge
-    $removedSomething = $true
-}
-
-# Only do cleanup if we removed something
-if ($removedSomething) {
-    # Cleanup: Remove folders containing Edge (Edge, EdgeCore, EdgeUpdate) or Temp but exclude EdgeWebView
-    Write-Log "Starting cleanup of Microsoft Edge folders"
-    $edgeFolders = Get-ChildItem -Path "$env:SystemDrive\Program Files (x86)\Microsoft" -Directory -ErrorAction SilentlyContinue |
-    Where-Object { ($_.Name -like "*Edge*" -or $_.Name -like "*Temp*") -and $_.Name -notlike "*EdgeWebView*" }
-    if ($edgeFolders) {
-        Write-Log "Found $($edgeFolders.Count) Edge-related folder(s) to remove"
-        $edgeFolders | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Log "Cleanup of Microsoft Edge folders completed"
-    } else {
-        Write-Log "No Edge-related folders found to clean up"
-    }
-
-    Remove-EdgeShortcuts
-    Remove-EdgeRegistryKeys
-    Remove-AdditionalEdgeFolders
-    Install-EdgeProtocolRedirect
-}
-
-# Always check for and delete Edge scheduled tasks
-Write-Log "Checking for Edge scheduled tasks"
-try {
-    $edgeTasks = Get-ScheduledTask -TaskName "*Edge*" -ErrorAction SilentlyContinue
-    if ($edgeTasks) {
-        foreach ($task in $edgeTasks) {
-            # Skip the EdgeRemoval task
-            if ($task.TaskName -eq "EdgeRemoval") {
-                Write-Log "Skipping EdgeRemoval task: $($task.TaskName)"
-                continue
-            }
-            
-            Write-Log "Found Edge scheduled task: $($task.TaskName) - State: $($task.State)"
-            try {
-                Unregister-ScheduledTask -TaskName $task.TaskName -TaskPath $task.TaskPath -Confirm:$false -ErrorAction SilentlyContinue
-                Write-Log "Deleted scheduled task: $($task.TaskName)"
-            }
-            catch {
-                Write-Log "Failed to delete scheduled task: $($task.TaskName) - $($_.Exception.Message)"
-            }
-        }
-    } else {
-        Write-Log "No Edge scheduled tasks found"
-    }
-}
-catch {
-    Write-Log "Failed to check scheduled tasks: $($_.Exception.Message)"
-}
-
-Write-Log "Done."
-Write-Host "Done. See $logFile for details."
-
-'@
-
-    $edgeRemovalPath = Join-Path $scriptsDir "EdgeRemoval.ps1"
-    try {
-        $edgeRemovalContent | Out-File -FilePath $edgeRemovalPath -Encoding UTF8 -Force
-        Write-Log "Created: EdgeRemoval.ps1" "SUCCESS"
-    } catch {
-        Write-Log "Failed to create EdgeRemoval.ps1: $($_.Exception.Message)" "ERROR"
-    }
-
-
-    # Execute removal scripts and register scheduled tasks
-    $scriptsToExecute = @()
-    $scriptsToExecute += @{Path = "$scriptsDir\BloatRemoval.ps1"; Name = "BloatRemoval"; TriggerType = "Logon"}
-    $scriptsToExecute += @{Path = "$scriptsDir\EdgeRemoval.ps1"; Name = "EdgeRemoval"; TriggerType = "Startup"}
-
-    foreach ($script in $scriptsToExecute) {
-        if (Test-Path $script.Path) {
-            Write-Log "Executing $($script.Name) script..." "INFO"
-            try {
-                Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -NoProfile -File `"$($script.Path)`"" -Wait -NoNewWindow
-                Write-Log "$($script.Name) execution completed" "SUCCESS"
-            } catch {
-                Write-Log "$($script.Name) execution failed: $($_.Exception.Message)" "WARNING"
-            }
-
-            # Register scheduled task
-            Write-Log "Registering scheduled task for $($script.Name)..." "INFO"
-            try {
-                $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NoProfile -File `"$($script.Path)`""
-
-                if ($script.TriggerType -eq "Startup") {
-                    $trigger = New-ScheduledTaskTrigger -AtStartup
-                } else {
-                    $trigger = New-ScheduledTaskTrigger -AtLogon
-                }
-
-                $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 0
-                $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-
-                Register-ScheduledTask -TaskName $script.Name -TaskPath "\Winhance" -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
-                Write-Log "Registered scheduled task: $($script.Name)" "SUCCESS"
-            } catch {
-                Write-Log "Failed to register task $($script.Name): $($_.Exception.Message)" "ERROR"
-            }
-        }
-    }
-
-    Write-Log "Windows Apps removal configuration completed" "SUCCESS"
     # Create WinhanceInstall.ps1 script
     $winhanceInstallContent = @'
 
@@ -1924,7 +775,7 @@ try {
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile' -Name 'NetworkThrottlingIndex' -Type 'DWord' -Value 10 -Description 'Disable network packet throttling to reduce latency and improve online gaming responsiveness'
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' -Name 'TcpAckFrequency' -Type 'DWord' -Value 2 -Description 'Batch small network packets together before sending to improve efficiency. Disabling reduces latency for real-time online gaming but may slightly increase bandwidth usage'
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' -Name 'TCPNoDelay' -Type 'DWord' -Value 0 -Description 'Batch small network packets together before sending to improve efficiency. Disabling reduces latency for real-time online gaming but may slightly increase bandwidth usage'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\GameConfigStore' -Name 'AllowGameDVR' -Type 'DWord' -Value 0 -Description 'Record gameplay clips and take screenshots using the Xbox Game Bar overlay. Disabling reduces CPU/GPU usage and can improve frame rates'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\GameConfigStore' -Name 'AllowGameDVR' -Type 'DWord' -Value 1 -Description 'Record gameplay clips and take screenshots using the Xbox Game Bar overlay. Disabling reduces CPU/GPU usage and can improve frame rates'
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control' -Name 'ServicesPipeTimeout' -Type 'DWord' -Value 30000 -Description 'Reduce the startup timeout for Windows services from 60 to 30 seconds. This can speed up boot time slightly'
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\SysMain' -Name 'Start' -Type 'DWord' -Value 4 -Description 'Preload frequently used applications into RAM for faster launch times. Automatic is recommended for HDDs, Manual or Disabled is preferred for SSDs'
     Set-RegistryValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters' -Name 'EnablePrefetcher' -Type 'DWord' -Value 0 -Description 'Preload frequently used applications and boot files into memory to speed up launches. Generally recommended for HDDs not SSDs'
@@ -1976,7 +827,7 @@ try {
         @{ TN="\Microsoft\Windows\PI\Sqm-Tasks"; Action="/Disable"; Desc="Collects software quality metrics and reliability data for Microsoft telemetry. Disable to improve privacy" },
         @{ TN="\Microsoft\Windows\Application Experience\MareBackup"; Action="/Disable"; Desc="Backs up Microsoft Assisted Recovery data. Disable to reduce background system activity" },
         @{ TN="\Microsoft\Windows\Application Experience\StartupAppTask"; Action="/Disable"; Desc="Tracks and monitors startup applications for telemetry and diagnostics. Disable to reduce telemetry" },
-        @{ TN="\Microsoft\Windows\Application Experience\PcaPatchDbTask"; Action="/Enable"; Desc="Updates the Program Compatibility Assistant database. Works with the Program Compatibility Assistant Service. Disable both to prevent compatibility checking" },
+        @{ TN="\Microsoft\Windows\Application Experience\PcaPatchDbTask"; Action="/Disable"; Desc="Updates the Program Compatibility Assistant database. Works with the Program Compatibility Assistant Service. Disable both to prevent compatibility checking" },
         @{ TN="\Microsoft\Windows\Maps\MapsUpdateTask"; Action="/Disable"; Desc="Updates offline maps data for the Windows Maps app. Disable if you don''t use the Maps app to save bandwidth and storage" },
         @{ TN="\Microsoft\Windows\Autochk\Proxy"; Action="/Disable"; Desc="Performs disk checking operations and collects diagnostic data. Consider keeping enabled for disk health monitoring" },
         @{ TN="\Microsoft\Windows\Shell\FamilySafetyMonitor"; Action="/Disable"; Desc="Monitors family safety settings and usage. Disable if you don''t use family safety features" },
@@ -2053,8 +904,8 @@ try {
     # SOUND SETTINGS
     # ============================================================================
 
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation' -Name 'DisableStartupSound' -Type 'DWord' -Value 0 -Description 'Play the Windows startup sound when your computer boots up'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\EditionOverrides' -Name 'UserSetting_DisableStartupSound' -Type 'DWord' -Value 0 -Description 'Play the Windows startup sound when your computer boots up'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\BootAnimation' -Name 'DisableStartupSound' -Type 'DWord' -Value 1 -Description 'Play the Windows startup sound when your computer boots up'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\EditionOverrides' -Name 'UserSetting_DisableStartupSound' -Type 'DWord' -Value 1 -Description 'Play the Windows startup sound when your computer boots up'
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings' -Name 'AgentActivationEnabled' -Type 'DWord' -Value 0 -Description 'Allow apps to listen and respond to voice commands like "Hey Cortana"'
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\SpeechOneCore\Settings' -Name 'AgentActivationLastUsed' -Type 'DWord' -Value 0 -Description 'Remember and apply the most recently used voice activation configuration'
 
@@ -2063,15 +914,15 @@ try {
     # ============================================================================
 
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization' -Name 'DODownloadMode' -Type 'DWord' -Value 99 -Description 'Share downloaded updates with other PCs on your network or the internet to reduce bandwidth usage'
-    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings' -Name 'IsContinuousInnovationOptedIn' -Type 'DWord' -Value 1 -Description 'Be among the first to get the latest non-security updates, fixes, and improvements as they roll out'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'AllowMUUpdateService' -Type 'DWord' -Value 1 -Description 'Get Microsoft Office and other updates together with Windows updates'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'IsExpedited' -Type 'DWord' -Value 1 -Description 'Restart as soon as possible (even during active hours) to finish updating'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings' -Name 'IsContinuousInnovationOptedIn' -Type 'DWord' -Value 0 -Description 'Be among the first to get the latest non-security updates, fixes, and improvements as they roll out'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'AllowMUUpdateService' -Type 'DWord' -Value 0 -Description 'Get Microsoft Office and other updates together with Windows updates'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'IsExpedited' -Type 'DWord' -Value 0 -Description 'Restart as soon as possible (even during active hours) to finish updating'
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Type 'DWord' -Value 1 -Description 'Prevents automatic restarts after installing updates when users are logged on'
-    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'SetUpdateNotificationLevel' -Type 'DWord' -Value 2 -Description 'Show or hide notifications about available updates and update progress'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'RestartNotificationsAllowed2' -Type 'DWord' -Value 1 -Description 'Show notification when your device requires a restart to finish updating'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'SetUpdateNotificationLevel' -Type 'DWord' -Value 1 -Description 'Show or hide notifications about available updates and update progress'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\WindowsUpdate\UX\Settings' -Name 'RestartNotificationsAllowed2' -Type 'DWord' -Value 0 -Description 'Show notification when your device requires a restart to finish updating'
     Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings' -Name 'AllowAutoWindowsUpdateDownloadOverMeteredNetwork' -Type 'DWord' -Value 0 -Description 'Allow Windows to download updates when using mobile hotspots or data-limited connections'
-    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'ExcludeWUDriversInQualityUpdate' -Type 'DWord' -Value 0 -Description 'Prevent Windows from automatically downloading and installing hardware driver updates'
-    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore' -Name 'AutoDownload' -Type 'DWord' -Value 4 -Description 'Automatically download and install updates for apps from the Microsoft Store'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'ExcludeWUDriversInQualityUpdate' -Type 'DWord' -Value 1 -Description 'Prevent Windows from automatically downloading and installing hardware driver updates'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore' -Name 'AutoDownload' -Type 'DWord' -Value 2 -Description 'Automatically download and install updates for apps from the Microsoft Store'
 
     # ============================================================================
     # EXPLORER SETTINGS
@@ -2169,6 +1020,9 @@ Windows Registry Editor Version 5.00
     # START MENU SETTINGS
     # ============================================================================
 
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'HideRecommendedSection' -Type 'DWord' -Value 1 -Description 'Show or hide the lower section that displays recently opened files and suggested apps'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Start' -Name 'HideRecommendedSection' -Type 'DWord' -Value 1 -Description 'Show or hide the lower section that displays recently opened files and suggested apps'
+    Set-RegistryValue -Path 'HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\Education' -Name 'IsEducationEnvironment' -Type 'DWord' -Value 1 -Description 'Show or hide the lower section that displays recently opened files and suggested apps'
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\Explorer' -Name 'DisableSearchBoxSuggestions' -Type 'DWord' -Value 1 -Description 'Prevent web results from Bing from appearing when searching in the Start Menu, showing only local files and apps'
 
     # ============================================================================
@@ -2327,23 +1181,23 @@ if ($UserCustomizations) {
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\GameBar' -Name 'UseNexusForGameBarEnabled' -Type 'DWord' -Value 0 -Description 'Allow your Xbox/compatible controller to open Game Bar by pressing the Xbox button. Disable to prevent accidental Game Bar activation during gaming'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\GameBar' -Name 'ShowStartupPanel' -Type 'DWord' -Value 0 -Description 'Show tips and hints about Game Bar features when opening the overlay. Disabling reduces distractions during gameplay'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects' -Name 'VisualFXSetting' -Type 'DWord' -Value 3 -Description 'Choose how Windows displays visual effects'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 4 -BitMask 0x02 -SetBit $True -Description 'Enables animation effects for controls and UI elements'
-        Set-RegistryValue -Path 'HKCU:\Control Panel\Desktop\WindowMetrics' -Name 'MinAnimate' -Type 'String' -Value '1' -Description 'Shows smooth animation when windows are minimized or maximized'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarAnimations' -Type 'DWord' -Value 1 -Description 'Controls taskbar animation effects for opening, closing, and switching windows'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 4 -BitMask 0x02 -SetBit $False -Description 'Enables animation effects for controls and UI elements'
+        Set-RegistryValue -Path 'HKCU:\Control Panel\Desktop\WindowMetrics' -Name 'MinAnimate' -Type 'String' -Value '0' -Description 'Shows smooth animation when windows are minimized or maximized'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarAnimations' -Type 'DWord' -Value 0 -Description 'Controls taskbar animation effects for opening, closing, and switching windows'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'EnableAeroPeek' -Type 'DWord' -Value 1 -Description 'Allows peeking at desktop when hovering over Show Desktop button'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x02 -SetBit $True -Description 'Animates menus when they appear using fade or slide effects'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 1 -BitMask 0x08 -SetBit $True -Description 'Animates tooltips when they appear using fade or slide effects'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 1 -BitMask 0x04 -SetBit $True -Description 'Fades menu items after selection before closing the menu'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type 'DWord' -Value 1 -Description 'Saves thumbnail previews of taskbar windows for faster display'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x02 -SetBit $False -Description 'Animates menus when they appear using fade or slide effects'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 1 -BitMask 0x08 -SetBit $False -Description 'Animates tooltips when they appear using fade or slide effects'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 1 -BitMask 0x04 -SetBit $False -Description 'Fades menu items after selection before closing the menu'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\DWM' -Name 'AlwaysHibernateThumbnails' -Type 'DWord' -Value 0 -Description 'Saves thumbnail previews of taskbar windows for faster display'
         Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 1 -BitMask 0x20 -SetBit $False -Description 'Displays shadow effect underneath the mouse cursor'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 2 -BitMask 0x04 -SetBit $True -Description 'Displays shadow effects underneath windows'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 2 -BitMask 0x04 -SetBit $False -Description 'Displays shadow effects underneath windows'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'IconsOnly' -Type 'DWord' -Value 0 -Description 'Displays image and document previews instead of generic file icons'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewAlphaSelect' -Type 'DWord' -Value 1 -Description 'Display a semi-transparent selection box when dragging to select multiple files or items'
         Set-RegistryValue -Path 'HKCU:\Control Panel\Desktop' -Name 'DragFullWindows' -Type 'String' -Value '1' -Description 'Displays window contents when dragging instead of just an outline'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x04 -SetBit $True -Description 'Animates combo boxes when they open with a sliding effect'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x04 -SetBit $False -Description 'Animates combo boxes when they open with a sliding effect'
         Set-RegistryValue -Path 'HKCU:\Control Panel\Desktop' -Name 'FontSmoothing' -Type 'String' -Value '2' -Description 'Apply anti-aliasing to text for smoother, more readable fonts on screen'
-        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x08 -SetBit $True -Description 'Enables smooth scrolling in list boxes instead of jumping'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type 'DWord' -Value 1 -Description 'Add shadow effects behind desktop icon text to improve readability against backgrounds'
+        Set-BinaryBit -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -ByteIndex 0 -BitMask 0x08 -SetBit $False -Description 'Enables smooth scrolling in list boxes instead of jumping'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ListviewShadow' -Type 'DWord' -Value 0 -Description 'Add shadow effects behind desktop icon text to improve readability against backgrounds'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Narrator\NoRoam' -Name 'WinEnterLaunchEnabled' -Type 'DWord' -Value 0 -Description 'Enable the Win+Ctrl+Enter keyboard shortcut to quickly launch Windows Narrator screen reader'
         Set-RegistryValue -Path 'HKCU:\Control Panel\Accessibility\StickyKeys' -Name 'Flags' -Type 'String' -Value '2' -Description 'Enable the keyboard shortcut to activate StickyKeys by pressing the Shift key five times'
         Set-RegistryValue -Path 'HKCU:\Control Panel\Accessibility\Keyboard Response' -Name 'Flags' -Type 'String' -Value '2' -Description 'Enable the keyboard shortcut to activate FilterKeys by holding the right Shift key for 8 seconds'
@@ -2355,11 +1209,11 @@ if ($UserCustomizations) {
         # NOTIFICATIONS SETTINGS
         # ============================================================================
 
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type 'DWord' -Value 1 -Description 'Get notifications from apps and other senders in Windows'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND' -Type 'DWord' -Value 1 -Description 'Play audio alerts when notifications arrive from apps and system senders'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK' -Type 'DWord' -Value 1 -Description 'Display toast notifications on the lock screen when your device is locked'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'LockScreenToastEnabled' -Type 'DWord' -Value 1 -Description 'Display toast notifications on the lock screen when your device is locked'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK' -Type 'DWord' -Value 1 -Description 'Display critical notifications like reminders and VoIP calls when your device is locked'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'ToastEnabled' -Type 'DWord' -Value 0 -Description 'Get notifications from apps and other senders in Windows'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND' -Type 'DWord' -Value 0 -Description 'Play audio alerts when notifications arrive from apps and system senders'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_TOASTS_ABOVE_LOCK' -Type 'DWord' -Value 0 -Description 'Display toast notifications on the lock screen when your device is locked'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications' -Name 'LockScreenToastEnabled' -Type 'DWord' -Value 0 -Description 'Display toast notifications on the lock screen when your device is locked'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_CRITICAL_TOASTS_ABOVE_LOCK' -Type 'DWord' -Value 0 -Description 'Display critical notifications like reminders and VoIP calls when your device is locked'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowNotificationIcon' -Type 'DWord' -Value 0 -Description 'Display the notification bell icon in the system tray'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContent-310093Enabled' -Type 'DWord' -Value 0 -Description 'Show what''s new and suggested after updates and when signed in'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement' -Name 'ScoobeSystemSettingEnabled' -Type 'DWord' -Value 0 -Description 'Show suggestions to help you complete device setup and optimize Windows features'
@@ -2379,15 +1233,15 @@ if ($UserCustomizations) {
 
         Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WorkplaceJoin' -Name 'BlockAADWorkplaceJoin' -Type 'DWord' -Value 1 -Description 'Blocks the ''Allow my organization to manage my device'' and ''No, sign in to this app only'' pop-up messages'
         Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' -Name 'Disabled' -Type 'DWord' -Value 1 -Description 'Choose if Windows should collect and send crash reports and error information to Microsoft'
-        Set-RegistryValue -Path 'HKCU:\Software\Winhance\Settings' -Name 'AdsPromotionalContentMode' -Type 'DWord' -Value 2 -Description 'Controls all advertising, suggestions, and promotional content throughout Windows'
+        Set-RegistryValue -Path 'HKCU:\Software\Winhance\Settings' -Name 'AdsPromotionalContentMode' -Type 'DWord' -Value 1 -Description 'Controls all advertising, suggestions, and promotional content throughout Windows'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Type 'DWord' -Value 0 -Description 'Allows Windows to deliver promotional content and automatically install suggested apps'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SubscribedContentEnabled' -Type 'DWord' -Value 0 -Description 'Enables promotional content subscriptions from Microsoft and partners throughout Windows'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'FeatureManagementEnabled' -Type 'DWord' -Value 0 -Description 'Enables Windows feature management functionality for promotional features and automatic app installations'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SoftLandingEnabled' -Type 'DWord' -Value 0 -Description 'Displays tips and notifications about Windows features as you use the operating system'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Type 'DWord' -Value 1 -Description 'Prevents OEM manufacturers from automatically installing bloatware apps'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Type 'DWord' -Value 1 -Description 'Prevents Microsoft from automatically installing suggested apps'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'PreInstalledAppsEverEnabled' -Type 'DWord' -Value 1 -Description 'Disables tracking of whether pre-installed apps were ever enabled'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Type 'DWord' -Value 1 -Description 'Prevents apps from being silently installed in the background'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Type 'DWord' -Value 0 -Description 'Prevents OEM manufacturers from automatically installing bloatware apps'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Type 'DWord' -Value 0 -Description 'Prevents Microsoft from automatically installing suggested apps'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'PreInstalledAppsEverEnabled' -Type 'DWord' -Value 0 -Description 'Disables tracking of whether pre-installed apps were ever enabled'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Type 'DWord' -Value 0 -Description 'Prevents apps from being silently installed in the background'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'RotatingLockScreenEnabled' -Type 'DWord' -Value 0 -Description 'Displays rotating Windows Spotlight images on your lock screen instead of a static background'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Type 'DWord' -Value 0 -Description 'Displays fun facts, tips, and tricks as an overlay on your lock screen'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager' -Name 'SlideshowEnabled' -Type 'DWord' -Value 0 -Description 'Enables slideshow option for lock screen background'
@@ -2428,10 +1282,10 @@ if ($UserCustomizations) {
         # SOUND SETTINGS
         # ============================================================================
 
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Multimedia\Audio' -Name 'UserDuckingPreference' -Type 'DWord' -Value 1 -Description 'Automatically lower volume of media and apps when Windows detects communication activity'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Multimedia\Audio' -Name 'UserDuckingPreference' -Type 'DWord' -Value 3 -Description 'Automatically lower volume of media and apps when Windows detects communication activity'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Narrator\NoRoam' -Name 'DuckAudio' -Type 'DWord' -Value 0 -Description 'Allow Narrator to automatically lower the volume of other applications when it speaks'
         Set-RegistryValue -Path 'HKCU:\Control Panel\Accessibility' -Name 'Sound on Activation' -Type 'DWord' -Value 0 -Description 'Play sounds when accessibility features like StickyKeys or FilterKeys are activated'
-        Set-RegistryValue -Path 'HKCU:\Control Panel\Accessibility' -Name 'Warning Sounds' -Type 'DWord' -Value 1 -Description 'Play warning sounds when attempting to activate accessibility features or when accessibility-related events occur'
+        Set-RegistryValue -Path 'HKCU:\Control Panel\Accessibility' -Name 'Warning Sounds' -Type 'DWord' -Value 0 -Description 'Play warning sounds when attempting to activate accessibility features or when accessibility-related events occur'
 
         # ============================================================================
         # WINDOWS UPDATE SETTINGS
@@ -2439,16 +1293,16 @@ if ($UserCustomizations) {
 
         Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization' -Name 'DODownloadMode' -Type 'DWord' -Value 99 -Description 'Share downloaded updates with other PCs on your network or the internet to reduce bandwidth usage'
         Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Type 'DWord' -Value 1 -Description 'Prevents automatic restarts after installing updates when users are logged on'
-        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'SetUpdateNotificationLevel' -Type 'DWord' -Value 2 -Description 'Show or hide notifications about available updates and update progress'
-        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'ExcludeWUDriversInQualityUpdate' -Type 'DWord' -Value 0 -Description 'Prevent Windows from automatically downloading and installing hardware driver updates'
-        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\WindowsStore' -Name 'AutoDownload' -Type 'DWord' -Value 4 -Description 'Automatically download and install updates for apps from the Microsoft Store'
+        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'SetUpdateNotificationLevel' -Type 'DWord' -Value 1 -Description 'Show or hide notifications about available updates and update progress'
+        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Name 'ExcludeWUDriversInQualityUpdate' -Type 'DWord' -Value 1 -Description 'Prevent Windows from automatically downloading and installing hardware driver updates'
+        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\WindowsStore' -Name 'AutoDownload' -Type 'DWord' -Value 2 -Description 'Automatically download and install updates for apps from the Microsoft Store'
 
         # ============================================================================
         # EXPLORER SETTINGS
         # ============================================================================
 
-        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer' -Name 'link' -Type 'Binary' -Value @(0x00,0x00,0x00,0x00) -Description 'Prevents Windows from appending ''- Shortcut'' text to newly created shortcut file names'
-        Remove-RegistryKey -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32' -Description 'Use the Windows 10-style right-click menu with all options visible instead of the simplified Windows 11 menu'
+        New-RegistryKey -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32' -Description 'Use the Windows 10-style right-click menu with all options visible instead of the simplified Windows 11 menu'
+        Set-RegistryValue -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32' -Name '(Default)' -Type 'String' -Value '' -Description 'Use the Windows 10-style right-click menu with all options visible instead of the simplified Windows 11 menu'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Lighting' -Name 'AmbientLightingEnabled' -Type 'DWord' -Value 0 -Description 'Allow Windows Dynamic Lighting to control ambient RGB effects on compatible devices'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Lighting' -Name 'ControlledByForegroundApp' -Type 'DWord' -Value 0 -Description 'Allow compatible apps to control device lighting effects'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Windows' -Name 'LegacyDefaultPrinterMode' -Type 'DWord' -Value 1 -Description 'Prevents Windows from automatically changing your default printer based on location or last used printer'
@@ -2461,7 +1315,7 @@ if ($UserCustomizations) {
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShowFrequent' -Type 'DWord' -Value 0 -Description 'Displays your most accessed folders in Quick Access section'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'ShowCloudFilesInQuickAccess' -Type 'DWord' -Value 0 -Description 'Displays cloud files from your Office.com account in Quick Access'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'IconsOnly' -Type 'DWord' -Value 0 -Description 'Displays generic file icons instead of image/document previews'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'UseCompactMode' -Type 'DWord' -Value 1 -Description 'Reduces vertical spacing between files and folders for denser view'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'UseCompactMode' -Type 'DWord' -Value 0 -Description 'Reduces vertical spacing between files and folders for denser view'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowTypeOverlay' -Type 'DWord' -Value 1 -Description 'Shows file type icon overlay on bottom-right corner of thumbnail previews'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'FolderContentsInfoTip' -Type 'DWord' -Value 1 -Description 'Shows total size and file count when hovering over folders'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState' -Name 'FullPath' -Type 'DWord' -Value 1 -Description 'Shows complete directory path in window title instead of folder name only'
@@ -2520,11 +1374,11 @@ Windows Registry Editor Version 5.00
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'HideMergeConflicts' -Type 'DWord' -Value 0 -Description 'Automatically merges folders with same name without confirmation dialog'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowSuperHidden' -Type 'DWord' -Value 0 -Description 'Displays system files marked with the SuperHidden attribute'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'SeparateProcess' -Type 'DWord' -Value 0 -Description 'Runs each Explorer window in its own process to prevent crashes affecting all windows'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'PersistBrowsers' -Type 'DWord' -Value 1 -Description 'Reopens Explorer windows that were open when you last shut down or logged off'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'PersistBrowsers' -Type 'DWord' -Value 0 -Description 'Reopens Explorer windows that were open when you last shut down or logged off'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowDriveLettersFirst' -Type 'DWord' -Value 4 -Description 'Displays drive letters (C:, D:) before drive names in This PC'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowEncryptCompressedColor' -Type 'DWord' -Value 1 -Description 'Displays encrypted files in green and compressed files in blue'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowInfoTip' -Type 'DWord' -Value 1 -Description 'Displays tooltip with item details when hovering over files and folders'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowPreviewHandlers' -Type 'DWord' -Value 1 -Description 'Enables file content preview when selecting files in Explorer'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowPreviewHandlers' -Type 'DWord' -Value 0 -Description 'Enables file content preview when selecting files in Explorer'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowStatusBar' -Type 'DWord' -Value 1 -Description 'Displays bar at bottom showing item count and selected file sizes'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowSyncProviderNotifications' -Type 'DWord' -Value 0 -Description 'Displays cloud sync status notifications from OneDrive and other sync providers'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'AutoCheckSelect' -Type 'DWord' -Value 0 -Description 'Adds checkboxes next to items for easier multi-selection'
@@ -2539,19 +1393,20 @@ Windows Registry Editor Version 5.00
         # START MENU SETTINGS
         # ============================================================================
 
+        Set-RegistryValue -Path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer' -Name 'HideRecommendedSection' -Type 'DWord' -Value 1 -Description 'Show or hide the lower section that displays recently opened files and suggested apps'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'ShowAllPinsList' -Type 'DWord' -Value 1 -Description 'Automatically expand to show all pinned apps instead of requiring you to click ''All apps'''
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'ShowRecentList' -Type 'DWord' -Value 1 -Description 'Display a list of recently installed applications at the top of the All Apps list'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'ShowFrequentList' -Type 'DWord' -Value 1 -Description 'Display your frequently launched applications at the top of the All Apps list for quick access'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_TrackDocs' -Type 'DWord' -Value 1 -Description 'Display your recently opened documents and files in the Start Menu''s Recommended section for quick access'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_IrisRecommendations' -Type 'DWord' -Value 1 -Description 'Display personalized suggestions from Windows for tips, app shortcuts, and Microsoft Store apps in the Recommended section'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_AccountNotifications' -Type 'DWord' -Value 1 -Description 'Display notifications about Microsoft account sign-in, sync status, and account-related suggestions'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'ShowRecentList' -Type 'DWord' -Value 0 -Description 'Display a list of recently installed applications at the top of the All Apps list'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'ShowFrequentList' -Type 'DWord' -Value 0 -Description 'Display your frequently launched applications at the top of the All Apps list for quick access'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_TrackDocs' -Type 'DWord' -Value 0 -Description 'Display your recently opened documents and files in the Start Menu''s Recommended section for quick access'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_IrisRecommendations' -Type 'DWord' -Value 0 -Description 'Display personalized suggestions from Windows for tips, app shortcuts, and Microsoft Store apps in the Recommended section'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'Start_AccountNotifications' -Type 'DWord' -Value 0 -Description 'Display notifications about Microsoft account sign-in, sync status, and account-related suggestions'
         Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\Windows\Explorer' -Name 'DisableSearchBoxSuggestions' -Type 'DWord' -Value 1 -Description 'Prevent web results from Bing from appearing when searching in the Start Menu, showing only local files and apps'
 
         # ============================================================================
         # TASKBAR SETTINGS
         # ============================================================================
 
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 1 -Description 'Choose how the Windows search appears on your taskbar: hidden, icon only, icon with label, or full search box'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 0 -Description 'Choose how the Windows search appears on your taskbar: hidden, icon only, icon with label, or full search box'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'TaskbarAl' -Type 'DWord' -Value 0 -Description 'Align taskbar icons to the left (classic Windows style) or center (Windows 11 default)'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'ShowTaskViewButton' -Type 'DWord' -Value 0 -Description 'Show the Task View button for managing virtual desktops and viewing all open windows at once'
         Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\Dsh' -Name 'AllowNewsAndInterests' -Type 'DWord' -Value 0 -Description 'Show the Widgets button that displays personalized news, weather, calendar, and other information'
@@ -2563,7 +1418,7 @@ Windows Registry Editor Version 5.00
 
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name 'AppsUseLightTheme' -Type 'DWord' -Value 0 -Description 'Choose between Light and Dark mode for Windows and apps'
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name 'SystemUsesLightTheme' -Type 'DWord' -Value 0 -Description 'Choose between Light and Dark mode for Windows and apps'
-        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name 'EnableTransparency' -Type 'DWord' -Value 1 -Description 'Enable translucent effects for the Start Menu, taskbar, and other Windows interface elements'
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name 'EnableTransparency' -Type 'DWord' -Value 0 -Description 'Enable translucent effects for the Start Menu, taskbar, and other Windows interface elements'
 
         Write-Log "Setting wallpaper based on Windows version and theme..." "INFO"
         $buildNumber = [System.Environment]::OSVersion.Version.Build
