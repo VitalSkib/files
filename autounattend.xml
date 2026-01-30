@@ -143,6 +143,14 @@
         </RunSynchronousCommand>
       </RunSynchronous>
     </component>
+		<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+    <InputLocale>en-US;ru-RU</InputLocale>
+    <SystemLocale>ru-RU</SystemLocale>
+    <UILanguage>en-US</UILanguage>
+    <UserLocale>ru-RU</UserLocale>
+    <TimeZone>West Asia Standard Time</TimeZone>
+    <CopySettingsToDefaultUser>true</CopySettingsToDefaultUser>
+		</component>
     <component name="Microsoft-Windows-Deployment" processorArchitecture="arm64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <RunSynchronous>
         <RunSynchronousCommand wcm:action="add">
