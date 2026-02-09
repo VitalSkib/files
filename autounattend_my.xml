@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+<unattend
+	xmlns="urn:schemas-microsoft-com:unattend"
+	xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
 	<settings pass="offlineServicing"></settings>
 	<settings pass="windowsPE">
 		<component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<InputLocale>0409:00000409;0419:00000419</InputLocale>
+			<SystemLocale>en-US</SystemLocale>
 			<UILanguage>en-US</UILanguage>
+			<UserLocale>ru-KZ</UserLocale>
 		</component>
 		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<ImageInstall>
@@ -45,6 +50,7 @@
 	<settings pass="specialize">
 		<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<ComputerName>SWR-PC</ComputerName>
+			<ProductKey>W269N-WFGWX-YVC9B-4J6C9-T83GX</ProductKey>
 			<TimeZone>Central Asia Standard Time</TimeZone>
 		</component>
 		<component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
@@ -111,15 +117,11 @@
 				<HideOnlineAccountScreens>false</HideOnlineAccountScreens>
 			</OOBE>
 			<FirstLogonCommands>
-    <SynchronousCommand wcm:action="add">
-        <Order>1</Order>
-        <CommandLine>powershell -ExecutionPolicy Bypass -File C:\Windows\Setup\Scripts\DefaultUser.ps1</CommandLine>
-    </SynchronousCommand>
-    <SynchronousCommand wcm:action="add">
-        <Order>2</Order>
-        <CommandLine>powershell -ExecutionPolicy Bypass -File C:\Windows\Setup\Scripts\UserOnce.ps1</CommandLine>
-    </SynchronousCommand>
-</FirstLogonCommands>
+				<SynchronousCommand wcm:action="add">
+					<Order>1</Order>
+					<CommandLine>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\FirstLogon.ps1"</CommandLine>
+				</SynchronousCommand>
+			</FirstLogonCommands>
 		</component>
 	</settings>
 	<Extensions xmlns="https://schneegans.de/windows/unattend-generator/">
@@ -396,8 +398,8 @@ $htmlAccentColor = '#0078D4';
 		<File path="C:\Windows\Setup\Scripts\GetWallpaper.ps1">
 $url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/img19.png';
 &amp; {
-    $ProgressPreference = 'SilentlyContinue';
-    (Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30).Content;
+	$ProgressPreference = 'SilentlyContinue';
+	( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
 };
 		</File>
 		<File path="C:\Windows\Setup\Scripts\SetWallpaper.ps1">
@@ -459,16 +461,16 @@ function Set-WallpaperImage {
 		"Cannot use '$LiteralPath' as a desktop wallpaper because that file does not exist.";
 	}
 }
-Set-WallpaperImage -LiteralPath 'C:\Windows\Setup\Scripts\Wallpaper.png';
+Set-WallpaperImage -LiteralPath 'C:\Windows\Setup\Scripts\Wallpaper';
 		</File>
 		<File path="C:\Windows\Setup\Scripts\GetLockScreenImage.ps1">
 $url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/11-lockscreen.jpg';
 &amp; {
-    $ProgressPreference = 'SilentlyContinue';
-    (Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30).Content;
+	$ProgressPreference = 'SilentlyContinue';
+	( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
 };
 		</File>
-		<File path="C:\Windows\Setup\Scripts\unattend-02.ps1">
+		<File path="C:\Windows\Setup\Scripts\unattend-01.ps1">
 winget install --id 7zip.7zip -e --source winget --accept-source-agreements --accept-package-agreements
 </File>
 		<File path="C:\Windows\Setup\Scripts\unattend-03.ps1">
@@ -707,7 +709,7 @@ $scripts = @(
         "--- Starting Optimization $(Get-Date) ---" | Out-File $optLog;
 
         $tweaks = @(
-            # 1. UI & Navigation Pane (Verified GUIDs)
+            # 1. UI Navigation Pane (Verified GUIDs)
             @{ Name = "Hide Gallery"; Cmd = 'reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /f' },
             @{ Name = "Hide Home"; Cmd = 'reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /f' },
             @{ Name = "Hide Network"; Cmd = 'reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}" /f' },
@@ -715,31 +717,31 @@ $scripts = @(
             @{ Name = "Shortcut Arrow"; Cmd = 'reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d "shell32.dll,-50" /f' },
             @{ Name = "Shortcut Suffix"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer" /v link /t REG_BINARY /d 00000000 /f' },
             
-            # 2. System & Power
+            # 2. System Power
             @{ Name = "Reserved Storage Off"; Cmd = 'reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f' },
             @{ Name = "Disable Hibernation"; Cmd = 'powercfg.exe /hibernate off' },
             @{ Name = "Power Performance"; Cmd = 'powercfg.exe /SETACVALUEINDEX SCHEME_CURRENT SUB_DISK DISKIDLE 0; powercfg.exe /SETACVALUEINDEX SCHEME_CURRENT SUB_USB USBSELECTIVE 0; powercfg.exe /SETACTIVE SCHEME_CURRENT' },
             
-            # 3. Start & Taskbar
+            # 3. Start Taskbar
             @{ Name = "Start Layout Pins"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_Layout" /t REG_DWORD /d 1 /f' },
             @{ Name = "Clock Seconds"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSecondsInSystemClock" /t REG_DWORD /d 1 /f' },
             @{ Name = "All Apps Grid"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_AllAppsView" /t REG_DWORD /d 0 /f' },
             @{ Name = "Taskbar: LastActiveClick"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LastActiveClick /t REG_DWORD /d 1 /f' },
             
-            # 4. Defender & Context Menu (Full Parity)
+            # 4. Defender Context Menu (Full Parity)
             @{ Name = "Def: Spynet Off"; Cmd = 'reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v SpynetReporting /t REG_DWORD /d 0 /f; reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v SubmitSamplesConsent /t REG_DWORD /d 2 /f' },
             @{ Name = "Def: Realtime Prot Fix"; Cmd = 'reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableRealtimeMonitoring /t REG_DWORD /d 1 /f; reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableBehaviorMonitoring /t REG_DWORD /d 1 /f; reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableScanOnRealtimeEnable /t REG_DWORD /d 1 /f' },
             @{ Name = "Rem Print"; Cmd = '$types = "image","batfile","cmdfile","docxfile","fonfile","htmlfile","inffile","inifile","JSEFile","otffile","pfmfile","regfile","rtffile","ttcfile","ttffile","txtfile","VBEFile","VBSFile","WSFFile"; foreach($t in $types) { reg.exe add "HKCR\$t\shell\print" /v ProgrammaticAccessOnly /t REG_SZ /d "" /f }' },
             @{ Name = "Rem Give Access"; Cmd = '$paths = "*","Directory\Background","Directory","Drive","LibraryFolder\background","UserLibraryFolder"; foreach($p in $paths) { reg.exe delete "HKCR\$p\shellex\ContextMenuHandlers\Sharing" /f }' },
             @{ Name = "Rem Edit in Notepad"; Cmd = 'reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{CA6CC9F1-867A-481E-951E-A28C5E4F01EA}" /t REG_SZ /d "" /f' },
             
-            # 5. Graphics & Others
+            # 5. Graphics Others
             @{ Name = "Graphics: TDR"; Cmd = 'reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v TdrDelay /t REG_DWORD /d 60 /f; reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v DxgKrnlVersion /t REG_DWORD /d 69634 /f' },
             @{ Name = "File Type .tx"; Cmd = 'reg.exe add "HKCR\.tx" /ve /t REG_SZ /d "Parsifal.Program" /f; reg.exe add "HKCR\.tx" /v PerceivedType /t REG_SZ /d "Image" /f' }
         );
 
         foreach ($t in $tweaks) {
-            $err = Invoke-Expression "$($t.Cmd) 2>&1";
+            $err = Invoke-Expression "$($t.Cmd) 2>&amp;1";
             if ($LASTEXITCODE -eq 0) { "SUCCESS: $($t.Name)" | Out-File $optLog -Append }
             else { "FAILED: $($t.Name) ($err)" | Out-File $optLog -Append }
         }
@@ -815,10 +817,10 @@ $scripts = @(
 	{
         # Force Kazakhstan regional standards (24h time and DD.MM.YYYY)
         $intl = 'HKU\DefaultUser\Control Panel\International';
-        reg.exe add $intl /v sShortTime /t REG_SZ /d "H:mm" /f;
-        reg.exe add $intl /v sTimeFormat /t REG_SZ /d "H:mm:ss" /f;
-        reg.exe add $intl /v sShortDate /t REG_SZ /d "dd.MM.yyyy" /f;
-        reg.exe add $intl /v iCountry /t REG_SZ /d "7" /f;
+		reg.exe add "$intl" /v iCountry /d "398" /f;
+		reg.exe add "$intl" /v sCountry /d "Kazakhstan" /f;
+		reg.exe add "$intl" /v sShortDate /d "dd.MM.yyyy" /f;
+		reg.exe add "$intl" /v sLongDate /d "dd.MM.yyyy" /f;
     };
 	{
 		reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
@@ -827,7 +829,10 @@ $scripts = @(
 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
 	};
 	{
-		Remove-ItemProperty -LiteralPath 'Registry::HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'OneDriveSetup' -Force -ErrorAction 'Continue';
+		$runPath = 'HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run';
+		if (Test-Path "Registry::$runPath") {
+			Remove-ItemProperty -LiteralPath "Registry::$runPath" -Name 'OneDriveSetup' -Force -ErrorAction 'SilentlyContinue';
+		}
 	};
 	{
 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f;
@@ -957,5 +962,5 @@ $scripts = @(
   }
 } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\FirstLogon.log";
 		</File>
-</Extensions>
+	</Extensions>
 </unattend>
