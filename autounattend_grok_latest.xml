@@ -1,0 +1,421 @@
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>0409:00000409;0419:00000419</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>ru-KZ</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DiskConfiguration>
+                <WillShowUI>OnError</WillShowUI>
+            </DiskConfiguration>
+            <ImageInstall>
+                <OSImage>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/NAME</Key>
+                            <Value>Windows 11 Pro</Value>
+                        </MetaData>
+                    </InstallFrom>
+                    <WillShowUI>OnError</WillShowUI>
+                </OSImage>
+            </ImageInstall>
+            <UserData>
+                <ProductKey>
+                    <Key>W269N-WFGWX-YVC9B-4J6C9-T83GX</Key>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+            </UserData>
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>5</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>6</Order>
+                    <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>
+    </settings>
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <ComputerName>SWR-PC</ComputerName>
+            <ProductKey>W269N-WFGWX-YVC9B-4J6C9-T83GX</ProductKey>
+            <TimeZone>Central Asia Standard Time</TimeZone>
+        </component>
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Path>powershell.exe -WindowStyle Hidden -Command "$xml = [xml]::new(); $xml.Load('C:\Windows\Panther\unattend.xml'); $sb = [scriptblock]::Create($xml.unattend.Extensions.ExtractScript); Invoke-Command -ScriptBlock $sb -ArgumentList $xml;"</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <Path>powershell.exe -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\Specialize.ps1"</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Path>reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v BypassNRO /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <Path>powershell.exe -WindowStyle Hidden -ExecutionPolicy Unrestricted -Command "Get-NetAdapter | Disable-NetAdapter -Confirm:$false"</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>5</Order>
+                    <Path>net accounts /maxpwage:UNLIMITED</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>6</Order>
+                    <Path>reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>7</Order>
+                    <Path>powershell.exe -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\DefaultUser.ps1"</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>8</Order>
+                    <Path>reg.exe unload "HKU\DefaultUser"</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>
+    </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <InputLocale>0409:00000409;0419:00000419</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>ru-KZ</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount wcm:action="add">
+                        <Name>SWR47</Name>
+                        <Group>Administrators</Group>
+                        <Password>
+                            <Value>509490</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+            <AutoLogon>
+                <Username>SWR47</Username>
+                <Enabled>true</Enabled>
+                <LogonCount>1</LogonCount>
+                <Password>
+                    <Value>509490</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+            </AutoLogon>
+            <OOBE>
+                <ProtectYourPC>3</ProtectYourPC>
+                <HideEULAPage>true</HideEULAPage>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <HideOnlineAccountScreens>false</HideOnlineAccountScreens>
+            </OOBE>
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <CommandLine>powershell.exe -WindowStyle Hidden -ExecutionPolicy Unrestricted -Command "Get-NetAdapter | Enable-NetAdapter -Confirm:$false"</CommandLine>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <CommandLine>powershell.exe -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\UserOnce.ps1"</CommandLine>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+        </component>
+    </settings>
+    <Extensions xmlns="https://schneegans.de/windows/unattend-generator/">
+        <ExtractScript>
+param([xml]$Document);
+foreach($file in $Document.unattend.Extensions.File){
+    $path = [Environment]::ExpandEnvironmentVariables($file.GetAttribute('path'));
+    mkdir -Path ($path | Split-Path -Parent) -ErrorAction SilentlyContinue;
+    $encoding = switch([IO.Path]::GetExtension($path)){
+        {$_ -in '.ps1','.xml'} {[Text.Encoding]::UTF8}
+        {$_ -in '.reg','.vbs','.js'} {[Text.UnicodeEncoding]::new($false,$true)}
+        default {[Text.Encoding]::Default}
+    };
+    $bytes = $encoding.GetPreamble() + $encoding.GetBytes($file.InnerText.Trim());
+    [IO.File]::WriteAllBytes($path,$bytes);
+}
+        </ExtractScript>
+        <File path="C:\Windows\Setup\Scripts\Specialize.ps1">
+$LogPath = "C:\UnattendLogs\Specialize.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+Write-Log "Starting Specialize.ps1" "INFO"
+&amp; "C:\Windows\Setup\Scripts\RemovePackages.ps1"
+if ($?) { Write-Log "RemovePackages success" "SUCCESS" } else { Write-Log "RemovePackages failed" "ERROR" }
+&amp; "C:\Windows\Setup\Scripts\RemoveCapabilities.ps1"
+if ($?) { Write-Log "RemoveCapabilities success" "SUCCESS" } else { Write-Log "RemoveCapabilities failed" "ERROR" }
+&amp; "C:\Windows\Setup\Scripts\RemoveFeatures.ps1"
+if ($?) { Write-Log "RemoveFeatures success" "SUCCESS" } else { Write-Log "RemoveFeatures failed" "ERROR" }
+Write-Log "Specialize.ps1 completed" "INFO"
+        </File>
+        <File path="C:\Windows\Setup\Scripts\DefaultUser.ps1">
+$LogPath = "C:\UnattendLogs\DefaultUser.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+Write-Log "Starting DefaultUser.ps1" "INFO"
+&amp; "C:\Windows\Setup\Scripts\SetStartPins.ps1"
+if ($?) { Write-Log "SetStartPins success" "SUCCESS" } else { Write-Log "SetStartPins failed" "ERROR" }
+&amp; "C:\Windows\Setup\Scripts\SetColorTheme.ps1"
+if ($?) { Write-Log "SetColorTheme success" "SUCCESS" } else { Write-Log "SetColorTheme failed" "ERROR" }
+Write-Log "DefaultUser.ps1 completed" "INFO"
+        </File>
+        <File path="C:\Windows\Setup\Scripts\RemovePackages.ps1">
+$LogPath = "C:\UnattendLogs\RemovePackages.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+$selectors = @('Microsoft.Microsoft3DViewer','Microsoft.BingSearch','Microsoft.WindowsCamera','Clipchamp.Clipchamp','Microsoft.Copilot','Microsoft.549981C3F5F10','MicrosoftCorporationII.MicrosoftFamily','Microsoft.Edge.GameAssist','Microsoft.GetHelp','Microsoft.Getstarted','microsoft.windowscommunicationsapps','Microsoft.WindowsMaps','Microsoft.MixedReality.Portal','Microsoft.BingNews','Microsoft.MicrosoftOfficeHub','Microsoft.Office.OneNote','Microsoft.OutlookForWindows','Microsoft.MSPaint','Microsoft.People','Microsoft.PowerAutomateDesktop','MicrosoftCorporationII.QuickAssist','Microsoft.SkypeApp','Microsoft.ScreenSketch','Microsoft.MicrosoftSolitaireCollection','Microsoft.MicrosoftStickyNotes','MicrosoftTeams','MSTeams','Microsoft.Todos','Microsoft.WindowsSoundRecorder','Microsoft.Wallet','Microsoft.Xbox.TCUI','Microsoft.XboxApp','Microsoft.XboxGameOverlay','Microsoft.XboxGamingOverlay','Microsoft.XboxIdentityProvider','Microsoft.XboxSpeechToTextOverlay','Microsoft.GamingApp','Microsoft.YourPhone','Microsoft.ZuneMusic','Microsoft.ZuneVideo');
+function Remove-Packages {
+    param([array]$selectors);
+    $provisioned = Get-AppxProvisionedPackage -Online;
+    $installed = Get-AppxPackage -AllUsers;
+    $all = $provisioned + $installed | Sort-Object -Unique -Property DisplayName, PackageName;
+    foreach ($package in $all) {
+        foreach ($selector in $selectors) {
+            if ($package.DisplayName -like $selector -or $package.PackageName -like $selector) {
+                Write-Log "Removing $($package.DisplayName) ($($package.PackageName))" "INFO"
+                if ($provisioned -contains $package) {
+                    Remove-AppxProvisionedPackage -Online -PackageName $package.PackageName 2>&amp;1 | Out-Null
+                    if ($LASTEXITCODE -eq 0) { Write-Log "Provisioned removal success" "SUCCESS" } else { Write-Log "Provisioned removal failed" "ERROR" }
+                }
+                if ($installed -contains $package) {
+                    Remove-AppxPackage -AllUsers -PackageName $package.PackageName 2>&amp;1 | Out-Null
+                    if ($LASTEXITCODE -eq 0) { Write-Log "Installed removal success" "SUCCESS" } else { Write-Log "Installed removal failed" "ERROR" }
+                }
+            }
+        }
+    }
+}
+Remove-Packages -selectors $selectors;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\RemoveCapabilities.ps1">
+$LogPath = "C:\UnattendLogs\RemoveCapabilities.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+$selectors = @('Print.Fax.Scan','Language.Handwriting','Browser.InternetExplorer','MathRecognizer','OneCoreUAP.OneSync','OpenSSH.Client','Microsoft.Windows.PowerShell.ISE','App.Support.QuickAssist','Microsoft.Windows.SnippingTool','Language.Speech','Language.TextToSpeech','App.StepsRecorder','Hello.Face.18967','Hello.Face.Migration.18967','Hello.Face.20134','Media.WindowsMediaPlayer');
+function Remove-Capabilities {
+    param([array]$selectors);
+    $all = Get-WindowsCapability -Online;
+    foreach ($capability in $all) {
+        foreach ($selector in $selectors) {
+            if ($capability.Name -like "*$selector*") {
+                Write-Log "Removing $($capability.Name)" "INFO"
+                Remove-WindowsCapability -Online -Name $capability.Name 2>&amp;1 | Out-Null
+                if ($LASTEXITCODE -eq 0) { Write-Log "Removal success" "SUCCESS" } else { Write-Log "Removal failed" "ERROR" }
+            }
+        }
+    }
+}
+Remove-Capabilities -selectors $selectors;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\RemoveFeatures.ps1">
+$LogPath = "C:\UnattendLogs\RemoveFeatures.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+$selectors = @('MediaPlayback','Microsoft-RemoteDesktopConnection','Recall');
+function Remove-Features {
+    param([array]$selectors);
+    $all = Get-WindowsOptionalFeature -Online;
+    foreach ($feature in $all) {
+        foreach ($selector in $selectors) {
+            if ($feature.FeatureName -like "*$selector*") {
+                Write-Log "Removing $($feature.FeatureName)" "INFO"
+                Disable-WindowsOptionalFeature -Online -FeatureName $feature.FeatureName -NoRestart 2>&amp;1 | Out-Null
+                if ($LASTEXITCODE -eq 0) { Write-Log "Removal success" "SUCCESS" } else { Write-Log "Removal failed" "ERROR" }
+            }
+        }
+    }
+}
+Remove-Features -selectors $selectors;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\SetStartPins.ps1">
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Start" /v "PinnedList" /t REG_MULTI_SZ /d "" /f;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\SetColorTheme.ps1">
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d 0 /f;
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d 0 /f;
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "ColorPrevalence" /t REG_DWORD /d 0 /f;
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d 1 /f;
+reg add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v "AccentColor" /t REG_DWORD /d 0xd47800 /f;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\unattend-01.ps1">
+winget install -e --id 7zip.7zip
+        </File>
+        <File path="C:\Windows\Setup\Scripts\unattend-03.ps1">
+$url = 'https://aka.ms/vs/17/release/vc_redist.x64.exe';
+Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\vc_redist.x64.exe";
+Start-Process -FilePath "$env:TEMP\vc_redist.x64.exe" -ArgumentList '/quiet /norestart' -Wait;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\unattend-05.ps1">
+$url = 'https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal.msixbundle';
+Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\Terminal.msixbundle";
+Add-AppxProvisionedPackage -Online -PackagePath "$env:TEMP\Terminal.msixbundle";
+        </File>
+        <File path="C:\Windows\Setup\Scripts\unattend-06.ps1">
+DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /LimitAccess /Source:D:\sources\sxs
+        </File>
+        <File path="C:\Windows\Setup\Scripts\SetWallpaper.ps1">
+$url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/img19.png';
+Invoke-WebRequest -Uri $url -OutFile "C:\Windows\Web\Wallpaper\Windows\img19.jpg";
+reg add "HKCU\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d "C:\Windows\Web\Wallpaper\Windows\img19.jpg" /f;
+RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters;
+        </File>
+        <File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
+$LogPath = "C:\UnattendLogs\UserOnce.log"
+mkdir -Path "C:\UnattendLogs" -ErrorAction SilentlyContinue
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogEntry = "[$Timestamp] [$Level] $Message"
+    Add-Content -Path $LogPath -Value $LogEntry -Encoding UTF8
+}
+Write-Log "Starting UserOnce.ps1" "INFO"
+tzutil /s "Central Asia Standard Time"
+Set-WinHomeLocation -GeoId 137
+Remove-AppxPackage Microsoft.Windows.Ai.Copilot.Provider
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 3 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{e25b5814-6e4b-4bd9-a1e8-3f3c3b5d7f3a}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{0ddd015d-b06c-45f4-8342-231c9a8041f5}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{A0C69A99-21C8-4671-8703-7934162fcf1d}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{31C0DD25-9439-4F12-BF41-7FF4EDA38722}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{f42ee2d3-909f-4907-8871-4c22fc0bf756}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FolderDescriptions\{0ddd015d-b06c-45f4-8342-231c9a8041f5}\PropertyBag" /v ThisPCPolicy /t REG_SZ /d Hide /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d "%SYSTEMROOT%\System32\shell32.dll,-50" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v link /t REG_BINARY /d 00000000 /f
+Set-WindowsReservedStorageState -State Disabled
+powercfg /hibernate off
+powercfg /setactive scheme_min
+powercfg /change -disk-timeout-ac 0
+powercfg /change -disk-timeout-dc 0
+powercfg /change -standby-timeout-ac 0
+powercfg /change -standby-timeout-dc 0
+powercfg -setacvalueindex SCHEME_CURRENT SUB_SLEEP UNATTENDED 0
+powercfg -setdcvalueindex SCHEME_CURRENT SUB_SLEEP UNATTENDED 0
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_AllAppsView /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LastActiveClick /t REG_DWORD /d 1 /f
+Set-MpPreference -SubmitSamplesConsent 2
+Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPreference -DisableBehaviorMonitoring $true
+Set-MpPreference -DisableScanOnRealtimeEnable $true
+reg delete "HKCR\SystemFileAssociations\.bmp\Shell\print" /f
+reg delete "HKCR\SystemFileAssociations\.jpg\Shell\print" /f
+reg delete "HKCR\SystemFileAssociations\.png\Shell\print" /f
+reg delete "HKCR\SystemFileAssociations\.tif\Shell\print" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{f81e9010-6ea4-11da-a742-000bdbd316bd}" /t REG_SZ /d "" /f
+reg delete "HKCR\*\shell\OpenWithNotepad" /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v TdrDelay /t REG_DWORD /d 60 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6ce5-4d6c-8fce-1d6b36ee493d}" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{F02C1A0D-BE21-4350-88B0-7367fc96ef3c}" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309d}" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{59031a47-3f72-44a7-89c5-5595fe6b30ee}" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{645FF040-5081-101B-9F08-00AA002F954E}" /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 1 /f
+Remove-Item -Path "$env:USERPROFILE\3D Objects" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Music" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Videos" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Favorites" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Saved Games" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Searches" -Recurse -Force
+Remove-Item -Path "$env:USERPROFILE\Captures" -Recurse -Force
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+fsutil behavior set disableLastAccess 1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f
+taskkill /f /im OneDrive.exe
+%SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall
+Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk" -Force
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v DisableFileSyncNGSC /t REG_DWORD /d 1 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteAccess" /v fAllowToGetHelp /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Chat" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Security\VerifiedAndReputablePolicyState" /t REG_DWORD /d 0 /f
+Set-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy RemoteSigned -Force
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v HideFirstRunExperience /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Edge" /v StartupBoostEnabled /t REG_DWORD /d 0 /f
+schtasks /change /tn "Microsoft\Office\Office Automatic Updates 2.0" /disable
+assoc .tx=txfile
+winget source update
+winget install -e --id Brave.Brave
+winget install -e --id Google.Chrome
+winget install -e --id Mozilla.Firefox.Nightly
+winget install -e --id 7zip.7zip
+$vivetoolUrl = (Invoke-WebRequest -Uri "https://api.github.com/repos/thebookisclosed/ViVe/releases/latest" -UseBasicParsing | ConvertFrom-Json).assets.browser_download_url | Where-Object { $_.EndsWith(".zip") }
+Invoke-WebRequest -Uri $vivetoolUrl -OutFile "$env:TEMP\ViVeTool.zip"
+Expand-Archive -Path "$env:TEMP\ViVeTool.zip" -DestinationPath "$env:TEMP\ViVeTool"
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:49402389
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:49221331
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58988972
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:59265307
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:47205210
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58989002
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58988972
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:48433719
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:57118881
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58381341
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58527096
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:57156807
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:57259990
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:41118774
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:55805655
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58778013
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:58383338
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:59270880
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:59203365
+&amp; "$env:TEMP\ViVeTool\ViVeTool.exe" /enable /id:57703775
+        </File>
+    </Extensions>
+</unattend>
