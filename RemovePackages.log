@@ -1,0 +1,39 @@
+{"Selector":"Microsoft.Microsoft3DViewer","Message":"Package not installed."}
+{"Selector":"Microsoft.BingSearch","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.WindowsCamera","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Clipchamp.Clipchamp","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Copilot","Message":"Package not installed."}
+{"Selector":"Microsoft.549981C3F5F10","Message":"Package not installed."}
+{"Selector":"MicrosoftCorporationII.MicrosoftFamily","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Edge.GameAssist","Message":"Package not installed."}
+{"Selector":"Microsoft.GetHelp","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Getstarted","Message":"Package not installed."}
+{"Selector":"microsoft.windowscommunicationsapps","Message":"Package not installed."}
+{"Selector":"Microsoft.WindowsMaps","Message":"Package not installed."}
+{"Selector":"Microsoft.MixedReality.Portal","Message":"Package not installed."}
+{"Selector":"Microsoft.BingNews","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.MicrosoftOfficeHub","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Office.OneNote","Message":"Package not installed."}
+{"Selector":"Microsoft.OutlookForWindows","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.MSPaint","Message":"Package not installed."}
+{"Selector":"Microsoft.People","Message":"Package not installed."}
+{"Selector":"Microsoft.PowerAutomateDesktop","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"MicrosoftCorporationII.QuickAssist","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.SkypeApp","Message":"Package not installed."}
+{"Selector":"Microsoft.MicrosoftSolitaireCollection","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.MicrosoftStickyNotes","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"MicrosoftTeams","Message":"Package not installed."}
+{"Selector":"MSTeams","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Todos","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.WindowsSoundRecorder","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.Wallet","Message":"Package not installed."}
+{"Selector":"Microsoft.Xbox.TCUI","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.XboxApp","Message":"Package not installed."}
+{"Selector":"Microsoft.XboxGameOverlay","Message":"Package not installed."}
+{"Selector":"Microsoft.XboxGamingOverlay","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.XboxIdentityProvider","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.XboxSpeechToTextOverlay","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.GamingApp","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.YourPhone","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.ZuneMusic","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":false,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Package removed."}
+{"Selector":"Microsoft.ZuneVideo","Message":"Package not installed."}
