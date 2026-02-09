@@ -1,0 +1,5 @@
+Restart is suppressed because NoRestart is specified.
+{"Selector":"MediaPlayback","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":true,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Feature removed."}
+Restart is suppressed because NoRestart is specified.
+{"Selector":"Microsoft-RemoteDesktopConnection","Output":{"Path":null,"Online":true,"WinPath":null,"SysDrivePath":null,"RestartNeeded":true,"LogPath":"C:\\WINDOWS\\Logs\\DISM\\dism.log","ScratchDirectory":null,"LogLevel":2},"Message":"Feature removed."}
+{"Selector":"Recall","Message":"Feature not installed."}
