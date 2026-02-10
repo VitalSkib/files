@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
-	<settings pass="offlineServicing"></settings>
+	<settings pass="offlineServicing"/>
 	<settings pass="windowsPE">
 		<component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<InputLocale>0409:00000409;0419:00000419</InputLocale>
 			<SystemLocale>en-US</SystemLocale>
 			<UILanguage>en-US</UILanguage>
 			<UserLocale>ru-KZ</UserLocale>
+		</component>
+		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<DiskConfiguration>
+				<WillShowUI>OnError</WillShowUI>
+			</DiskConfiguration>
+			<ImageInstall>
+				<OSImage>
+					<WillShowUI>OnError</WillShowUI>
+				</OSImage>
+			</ImageInstall>
 		</component>
 		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<ImageInstall>
@@ -68,7 +78,7 @@
 			</RunSynchronous>
 		</component>
 	</settings>
-	<settings pass="generalize"></settings>
+	<settings pass="generalize"/>
 	<settings pass="specialize">
 		<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<ComputerName>SWR-PC</ComputerName>
@@ -101,8 +111,8 @@
 			</RunSynchronous>
 		</component>
 	</settings>
-	<settings pass="auditSystem"></settings>
-	<settings pass="auditUser"></settings>
+	<settings pass="auditSystem"/>
+	<settings pass="auditUser"/>
 	<settings pass="oobeSystem">
 		<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<InputLocale>0409:00000409;0419:00000419</InputLocale>
