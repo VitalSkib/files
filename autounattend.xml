@@ -3,10 +3,7 @@
 	<settings pass="offlineServicing"/>
 	<settings pass="windowsPE">
 		<component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
-			<InputLocale>0409:00000409;0419:00000419</InputLocale>
-			<SystemLocale>en-US</SystemLocale>
 			<UILanguage>en-US</UILanguage>
-			<UserLocale>ru-KZ</UserLocale>
 		</component>
 		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<DiskConfiguration>
@@ -15,19 +12,13 @@
 			<ImageInstall>
 				<OSImage>
 					<WillShowUI>OnError</WillShowUI>
-				</OSImage>
-			</ImageInstall>
-		</component>
-		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
-			<ImageInstall>
-				<OSImage>
+					<Compact>true</Compact>
 					<InstallFrom>
 						<MetaData wcm:action="add">
 							<Key>/IMAGE/NAME</Key>
 							<Value>Windows 11 Pro</Value>
 						</MetaData>
 					</InstallFrom>
-					<Compact>true</Compact>
 				</OSImage>
 			</ImageInstall>
 			<UserData>
@@ -37,7 +28,7 @@
 				</ProductKey>
 				<AcceptEula>true</AcceptEula>
 			</UserData>
-			<UseConfigurationSet>true</UseConfigurationSet>
+			<UseConfigurationSet>false</UseConfigurationSet>
 			<RunSynchronous>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>1</Order>
@@ -83,7 +74,7 @@
 		<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<ComputerName>SWR-PC</ComputerName>
 			<ProductKey>W269N-WFGWX-YVC9B-4J6C9-T83GX</ProductKey>
-			<TimeZone>Qyzylorda Standard Time</TimeZone>
+			<TimeZone>Central Asia Standard Time</TimeZone>
 			<SkipRearm>1</SkipRearm>
 		</component>
 		<component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
@@ -125,7 +116,7 @@
 				<LocalAccounts>
 					<LocalAccount wcm:action="add">
 						<Name>SWR47</Name>
-						<DisplayName>SWR47</DisplayName>
+						<DisplayName/>
 						<Group>Administrators</Group>
 						<Password>
 							<Value>509490</Value>
@@ -152,15 +143,11 @@
 			<FirstLogonCommands>
 				<SynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<CommandLine>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-NetAdapter | Enable-NetAdapter -Confirm:$false"</CommandLine>
+					<CommandLine>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-NetAdapter | Where-Object { $_.PhysicalMediaType -eq '802.3' -or $_.MediaType -eq '802.3' -or $_.InterfaceDescription -ilike '*Ethernet*' } | Enable-NetAdapter -Confirm:$false"</CommandLine>
 				</SynchronousCommand>
 				<SynchronousCommand wcm:action="add">
 					<Order>2</Order>
-					<CommandLine>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\FirstLogon.ps1"</CommandLine>
-				</SynchronousCommand>
-				<SynchronousCommand wcm:action="add">
-					<Order>3</Order>
-					<CommandLine>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\UserOnce.ps1"</CommandLine>
+					<CommandLine>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Windows\Setup\Scripts\FirstLogon.ps1"</CommandLine>
 				</SynchronousCommand>
 			</FirstLogonCommands>
 		</component>
@@ -185,46 +172,46 @@ foreach( $file in $Document.unattend.Extensions.File ) {
 		</ExtractScript>
 		<File path="C:\Windows\Setup\Scripts\RemovePackages.ps1">
 $selectors = @(
-	'Microsoft.Microsoft3DViewer',
-	'Microsoft.BingSearch',
-	'Microsoft.WindowsCamera',
-	'Clipchamp.Clipchamp',
-	'Microsoft.Copilot',
-	'Microsoft.549981C3F5F10',
-	'MicrosoftCorporationII.MicrosoftFamily',
-	'Microsoft.Edge.GameAssist',
-	'Microsoft.GetHelp',
-	'Microsoft.Getstarted',
-	'microsoft.windowscommunicationsapps',
-	'Microsoft.WindowsMaps',
-	'Microsoft.MixedReality.Portal',
-	'Microsoft.BingNews',
-	'Microsoft.MicrosoftOfficeHub',
-	'Microsoft.Office.OneNote',
-	'Microsoft.OutlookForWindows',
-	'Microsoft.MSPaint',
-	'Microsoft.People',
-	'Microsoft.PowerAutomateDesktop',
-	'MicrosoftCorporationII.QuickAssist',
-	'Microsoft.SkypeApp',
-	'Microsoft.ScreenSketch',
-	'Microsoft.MicrosoftSolitaireCollection',
-	'Microsoft.MicrosoftStickyNotes',
-	'MicrosoftTeams',
-	'MSTeams',
-	'Microsoft.Todos',
-	'Microsoft.WindowsSoundRecorder',
-	'Microsoft.Wallet',
-	'Microsoft.Xbox.TCUI',
-	'Microsoft.XboxApp',
-	'Microsoft.XboxGameOverlay',
-	'Microsoft.XboxGamingOverlay',
-	'Microsoft.XboxIdentityProvider',
-	'Microsoft.XboxSpeechToTextOverlay',
-	'Microsoft.GamingApp',
-	'Microsoft.YourPhone',
-	'Microsoft.ZuneMusic',
-	'Microsoft.ZuneVideo'
+	'Microsoft.Microsoft3DViewer';
+	'Microsoft.BingSearch';
+	'Microsoft.WindowsCamera';
+	'Clipchamp.Clipchamp';
+	'Microsoft.Copilot';
+	'Microsoft.549981C3F5F10';
+	'MicrosoftCorporationII.MicrosoftFamily';
+	'Microsoft.Edge.GameAssist';
+	'Microsoft.GetHelp';
+	'Microsoft.Getstarted';
+	'microsoft.windowscommunicationsapps';
+	'Microsoft.WindowsMaps';
+	'Microsoft.MixedReality.Portal';
+	'Microsoft.BingNews';
+	'Microsoft.MicrosoftOfficeHub';
+	'Microsoft.Office.OneNote';
+	'Microsoft.OutlookForWindows';
+	'Microsoft.MSPaint';
+	'Microsoft.People';
+	'Microsoft.PowerAutomateDesktop';
+	'MicrosoftCorporationII.QuickAssist';
+	'Microsoft.SkypeApp';
+	'Microsoft.ScreenSketch';
+	'Microsoft.MicrosoftSolitaireCollection';
+	'Microsoft.MicrosoftStickyNotes';
+	'MicrosoftTeams';
+	'MSTeams';
+	'Microsoft.Todos';
+	'Microsoft.WindowsSoundRecorder';
+	'Microsoft.Wallet';
+	'Microsoft.Xbox.TCUI';
+	'Microsoft.XboxApp';
+	'Microsoft.XboxGameOverlay';
+	'Microsoft.XboxGamingOverlay';
+	'Microsoft.XboxIdentityProvider';
+	'Microsoft.XboxSpeechToTextOverlay';
+	'Microsoft.GamingApp';
+	'Microsoft.YourPhone';
+	'Microsoft.ZuneMusic';
+	'Microsoft.ZuneVideo';
 );
 $getCommand = {
   Get-AppxProvisionedPackage -Online;
@@ -270,26 +257,25 @@ try {
 		</File>
 		<File path="C:\Windows\Setup\Scripts\RemoveCapabilities.ps1">
 $selectors = @(
-	'Print.Fax.Scan',
-	'Language.Handwriting',
-	'Browser.InternetExplorer',
-	'MathRecognizer',
-	'OneCoreUAP.OneSync',
-	'OpenSSH.Client',
-	'Microsoft.Windows.PowerShell.ISE',
-	'App.Support.QuickAssist',
-	'Language.Speech',
-	'Language.TextToSpeech',
-	'App.StepsRecorder',
-	'Hello.Face.18967',
-	'Hello.Face.Migration.18967',
-	'Hello.Face.20134',
-	'Media.WindowsMediaPlayer'
+	'Print.Fax.Scan';
+	'Language.Handwriting';
+	'Browser.InternetExplorer';
+	'MathRecognizer';
+	'OneCoreUAP.OneSync';
+	'OpenSSH.Client';
+	'App.Support.QuickAssist';
+	'Language.Speech';
+	'Language.TextToSpeech';
+	'App.StepsRecorder';
+	'Hello.Face.18967';
+	'Hello.Face.Migration.18967';
+	'Hello.Face.20134';
+	'Media.WindowsMediaPlayer';
 );
 $getCommand = {
   Get-WindowsCapability -Online | Where-Object -Property 'State' -NotIn -Value @(
-    'NotPresent',
-    'Removed'
+    'NotPresent';
+    'Removed';
   );
 };
 $filterCommand = {
@@ -333,15 +319,14 @@ try {
 		</File>
 		<File path="C:\Windows\Setup\Scripts\RemoveFeatures.ps1">
 $selectors = @(
-	'MediaPlayback',
-	'Microsoft-RemoteDesktopConnection',
-	'Recall',
-	'Microsoft-SnippingTool'
+	'MediaPlayback';
+	'Microsoft-RemoteDesktopConnection';
+	'Recall';
 );
 $getCommand = {
   Get-WindowsOptionalFeature -Online | Where-Object -Property 'State' -NotIn -Value @(
-    'Disabled',
-    'DisabledWithPayloadRemoved'
+    'Disabled';
+    'DisabledWithPayloadRemoved';
   );
 };
 $filterCommand = {
@@ -354,7 +339,7 @@ $removeCommand = {
     $InputObject
   );
   process {
-    $InputObject | Disable-WindowsOptionalFeature -Online -NoRestart -ErrorAction 'Continue';
+    $InputObject | Disable-WindowsOptionalFeature -Online -Remove -NoRestart -ErrorAction 'Continue';
   }
 };
 $type = 'Feature';
@@ -394,6 +379,56 @@ try {
 	"Specialize error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
 }
 		</File>
+		<File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
+$logfile = 'C:\UnattendLogs\UserOnce.log';
+
+try {
+    # 1. Check Winget
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        $wingetUrl = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
+        Invoke-WebRequest -Uri $wingetUrl -OutFile "$env:TEMP\winget.msixbundle" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+        Add-AppxPackage -Path "$env:TEMP\winget.msixbundle" *>> $logfile 2&gt;&amp;1
+    }
+
+    # 2. Via Winget
+    $apps = @('7zip.7zip', 'Brave.Brave', 'Google.Chrome', 'Mozilla.Firefox.Nightly', 'RARLab.WinRAR')
+    foreach ($app in $apps) {
+        winget install --id $app --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
+    }
+
+    # 3. Visual C++ Redistributable
+    Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+    Start-Process -FilePath "$env:TEMP\vc_redist.x64.exe" -ArgumentList "/quiet /norestart" -Wait *>> $logfile 2&gt;&amp;1
+
+    # 4. Windows Terminal
+    $termUrl = "https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_Win11.msixbundle"
+    Invoke-WebRequest -Uri $termUrl -OutFile "$env:TEMP\terminal.msixbundle" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+    Add-AppxPackage -Path "$env:TEMP\terminal.msixbundle" *>> $logfile 2&gt;&amp;1
+
+    # 5. ViVeTool
+    $vivetoolUrl = (Invoke-RestMethod "https://api.github.com/repos/thebookisclosed/ViVe/releases/latest").assets.browser_download_url | Where-Object {$_ -like "*zip"}
+    Invoke-WebRequest -Uri $vivetoolUrl -OutFile "$env:TEMP\ViVeTool.zip" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+    
+    $vivetoolPath = "$env:ProgramFiles\ViVeTool"
+    Expand-Archive -Path "$env:TEMP\ViVeTool.zip" -DestinationPath $vivetoolPath -Force *>> $logfile 2&gt;&amp;1
+
+    # 6. ViVeTool IDs
+    $ids = @(
+        49402389, 49221331, 58988972, 59265307, 47205210, 58989002, 
+        48433719, 57118881, 58381341, 58527096, 57156807, 57259990, 
+        41118774, 55805655, 58778013, 58383338, 59270880, 59203365, 57703775
+    )
+    foreach ($id in $ids) {
+        &amp; "$vivetoolPath\vivetool.exe" /enable /id:$id *>> $logfile 2&gt;&amp;1
+    }
+
+    # 7. Reatart
+    Restart-Computer -Force *>> $logfile 2&gt;&amp;1
+
+} catch {
+    "UserOnce error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
+}
+        </File>
 		<File path="C:\Windows\Setup\Scripts\DefaultUser.ps1">
 $logfile = 'C:\UnattendLogs\DefaultUser.log';
 
@@ -484,7 +519,6 @@ reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\CurrentVersion\
 reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
 reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "RemoteAssistance" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
 reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ChatIcon" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
-reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
 reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SpynetReporting" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
 reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SubmitSamplesConsent" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
 reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
@@ -716,53 +750,6 @@ reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "MinDxgKr
 reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "TdrDdiDelay" /t REG_DWORD /d 60 /f *>> $logfile 2&gt;&amp;1
 } catch {
 "FirstLogon error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
-}
-		</File>
-		<File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
-$logfile = 'C:\UnattendLogs\UserOnce.log';
-
-try {
-if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Add-AppxPackage -Path "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" *>> $logfile 2&gt;&amp;1
-}
-winget install --id 7zip.7zip --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
-winget install --id Brave.Brave --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
-winget install --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
-winget install --id Mozilla.Firefox.Nightly --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
-winget install --id RARLab.WinRAR --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
-
-Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" *>> $logfile 2&gt;&amp;1
-Start-Process -FilePath "$env:TEMP\vc_redist.x64.exe" -ArgumentList "/quiet /norestart" -Wait *>> $logfile 2&gt;&amp;1
-
-Add-AppxPackage -Path "https://github.com/microsoft/terminal/releases/latest/download/Microsoft.WindowsTerminal_*.msixbundle" *>> $logfile 2&gt;&amp;1
-
-Invoke-WebRequest -Uri "https://github.com/thebookisclosed/ViVe/releases/latest/download/ViVeTool-v0.*.zip" -OutFile "$env:TEMP\ViVeTool.zip" *>> $logfile 2&gt;&amp;1
-Expand-Archive -Path "$env:TEMP\ViVeTool.zip" -DestinationPath "$env:ProgramFiles\ViVeTool" *>> $logfile 2&gt;&amp;1
-$env:Path += ";$env:ProgramFiles\ViVeTool"
-
-vivetool /enable /id:49402389 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:49221331 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58988972 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:59265307 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:47205210 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58989002 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:48433719 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:57118881 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58381341 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58527096 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:57156807 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:57259990 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:41118774 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:55805655 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58778013 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:58383338 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:59270880 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:59203365 *>> $logfile 2&gt;&amp;1
-vivetool /enable /id:57703775 *>> $logfile 2&gt;&amp;1
-
-Restart-Computer -Force *>> $logfile 2&gt;&amp;1
-} catch {
-"UserOnce error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
 }
 		</File>
 	</Extensions>
