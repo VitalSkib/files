@@ -1,0 +1,1069 @@
+﻿
+===== Summary counts =====
+
+Original <File> blocks: 7
+Schneegans <File> blocks: 15
+Copilot <File> blocks: 15
+
+===== Comparing Original -> Copilot =====
+
+No missing <File> blocks.
+Per-block line differences (lines in source but not in target):
+Block: C:\Windows\Setup\Scripts\RemoveFeatures.ps1
+  - 	'MediaPlayback';
+  - 	'Microsoft-RemoteDesktopConnection';
+  - 	'Recall';
+  - try {
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - 	}
+  - } catch {
+  - 	"Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - }
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\RemovePackages.ps1
+  - 	'Microsoft.Microsoft3DViewer';
+  - 	'Microsoft.BingSearch';
+  - 	'Microsoft.WindowsCamera';
+  - 	'Clipchamp.Clipchamp';
+  - 	'Microsoft.Copilot';
+  - 	'Microsoft.549981C3F5F10';
+  - 	'MicrosoftCorporationII.MicrosoftFamily';
+  - 	'Microsoft.Edge.GameAssist';
+  - 	'Microsoft.GetHelp';
+  - 	'Microsoft.Getstarted';
+  - 	'microsoft.windowscommunicationsapps';
+  - 	'Microsoft.WindowsMaps';
+  - 	'Microsoft.MixedReality.Portal';
+  - 	'Microsoft.BingNews';
+  - 	'Microsoft.MicrosoftOfficeHub';
+  - 	'Microsoft.Office.OneNote';
+  - 	'Microsoft.OutlookForWindows';
+  - 	'Microsoft.MSPaint';
+  - 	'Microsoft.People';
+  - 	'Microsoft.PowerAutomateDesktop';
+  - 	'MicrosoftCorporationII.QuickAssist';
+  - 	'Microsoft.SkypeApp';
+  - 	'Microsoft.ScreenSketch';
+  - 	'Microsoft.MicrosoftSolitaireCollection';
+  - 	'Microsoft.MicrosoftStickyNotes';
+  - 	'MicrosoftTeams';
+  - 	'MSTeams';
+  - 	'Microsoft.Todos';
+  - 	'Microsoft.WindowsSoundRecorder';
+  - 	'Microsoft.Wallet';
+  - 	'Microsoft.Xbox.TCUI';
+  - 	'Microsoft.XboxApp';
+  - 	'Microsoft.XboxGameOverlay';
+  - 	'Microsoft.XboxGamingOverlay';
+  - 	'Microsoft.XboxIdentityProvider';
+  - 	'Microsoft.XboxSpeechToTextOverlay';
+  - 	'Microsoft.GamingApp';
+  - 	'Microsoft.YourPhone';
+  - 	'Microsoft.ZuneMusic';
+  - 	'Microsoft.ZuneVideo';
+  - try {
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - 	}
+  - } catch {
+  - 	"Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - }
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\UserOnce.ps1
+  -         Invoke-WebRequest -Uri $wingetUrl -OutFile "$env:TEMP\winget.msixbundle" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+  -         Add-AppxPackage -Path "$env:TEMP\winget.msixbundle" *>> $logfile 2&gt;&amp;1
+  -         winget install --id $app --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
+  -     Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+  -     Start-Process -FilePath "$env:TEMP\vc_redist.x64.exe" -ArgumentList "/quiet /norestart" -Wait *>> $logfile 2&gt;&amp;1
+  -     Invoke-WebRequest -Uri $termUrl -OutFile "$env:TEMP\terminal.msixbundle" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+  -     Add-AppxPackage -Path "$env:TEMP\terminal.msixbundle" *>> $logfile 2&gt;&amp;1
+  -     Invoke-WebRequest -Uri $vivetoolUrl -OutFile "$env:TEMP\ViVeTool.zip" -UseBasicParsing *>> $logfile 2&gt;&amp;1
+  -     Expand-Archive -Path "$env:TEMP\ViVeTool.zip" -DestinationPath $vivetoolPath -Force *>> $logfile 2&gt;&amp;1
+  -         &amp; "$vivetoolPath\vivetool.exe" /enable /id:$id *>> $logfile 2&gt;&amp;1
+  -     Restart-Computer -Force *>> $logfile 2&gt;&amp;1
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
+  - 	'Print.Fax.Scan';
+  - 	'Language.Handwriting';
+  - 	'Browser.InternetExplorer';
+  - 	'MathRecognizer';
+  - 	'OneCoreUAP.OneSync';
+  - 	'OpenSSH.Client';
+  - 	'App.Support.QuickAssist';
+  - 	'Language.Speech';
+  - 	'Language.TextToSpeech';
+  - 	'App.StepsRecorder';
+  - 	'Hello.Face.18967';
+  - 	'Hello.Face.Migration.18967';
+  - 	'Hello.Face.20134';
+  - 	'Media.WindowsMediaPlayer';
+  - try {
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - 	}
+  - } catch {
+  - 	"Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
+  - }
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\Specialize.ps1
+  - 	&amp; "C:\Windows\Setup\Scripts\RemovePackages.ps1" *>> $logfile 2&gt;&amp;1
+  - 	&amp; "C:\Windows\Setup\Scripts\RemoveCapabilities.ps1" *>> $logfile 2&gt;&amp;1
+  - 	&amp; "C:\Windows\Setup\Scripts\RemoveFeatures.ps1" *>> $logfile 2&gt;&amp;1
+  - 	"Specialize error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\DefaultUser.ps1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowCopilotButton" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarMn" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SeparateProcess" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LaunchTo" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "MMTaskbarEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowClassicMode" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_Layout" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisableThumbnailCache" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowAllAppsGrid" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_PinMode" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowDocuments" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowDownloads" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowMusic" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowPictures" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_ShowVideos" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_IrisRecommendations" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackDocs" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_TrackProgs" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Start_AccountNotifications" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LastActiveClick" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TDRDelay" /t REG_DWORD /d 60 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShortcutArrow" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "UseCompactMode" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowFileExtensions" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowHidden" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowEncryptCompressedColor" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTypeOverlay" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "SnapAssist" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "PersistBrowsers" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewAlphaSelect" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowInfoTip" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowStatusBar" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338388Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353698Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-314559Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353696Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353697Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338387Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Search" /v "CortanaConsent" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d 3 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "AppsUseLightTheme" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "SystemUsesLightTheme" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Control Panel\Desktop" /v "AutoColorization" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Start" /v "ShowMoreTiles" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Ribbon" /v "MinimizedStateTabletModeOff" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer" /v "ShortcutArrow" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" /v "NoTileApplicationNotification" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Siuf\Rules" /v "NumberOfSIUFInPeriod" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v "GlobalUserDisabled" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{C2BF9876-73F2-40BF-8DA3-708DC0E2A327}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{E5323777-F976-4f5b-9B55-B94699C46E44}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{BFA794E4-F964-4fdb-90F6-51056BFE4B44}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{D89823BA-7180-4D73-903B-7E1054EDB1A1}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{2EEF81BE-33FA-4800-9670-1CD474972C3F}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{52079E78-A92B-413F-B213-E8FE35712BE0}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{7D7E8402-7C54-4821-A34E-AEE1D3B96899}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{992AFA70-6F47-4148-B3E9-3003349C7258}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{2297E4E2-5DBE-63D5-E9B8-6765BD477AB8}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{235D2C6B-5E26-40BE-93DF-B112FCAF956B}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{6AC27878-A6FA-4155-BA85-F98F491D4F33}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{9221F3E9-4BB0-4CFB-9BBE-ACF8F569B4E1}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{E83AF229-8640-4D18-A2E3-777F2E996A1B}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{9D9E0118-1804-4F06-96E4-FE4B9B2331D5}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{E5323777-F976-4f5b-9B55-B94699C46E44}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\{C1D23ACC-752B-43E5-8448-8D0EB4A8F05D}" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\DeviceAccess\Global\LooselyCoupled" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\SYSTEM\CurrentControlSet\Control\FileSystem" /v "LongPathsEnabled" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\SYSTEM\CurrentControlSet\Control\FileSystem" /v "NtfsDisableLastAccessUpdate" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\OneDrive" /v "DisableFileSyncNgsc" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings" /v "ProxyEnable" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "RemoteAssistance" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ChatIcon" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SpynetReporting" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SubmitSamplesConsent" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableOnAccessProtection" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableScanOnRealtimeEnable" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Scan" /v "DisableArchiveScanning" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Scan" /v "DisableEmailScanning" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Scan" /v "DisableScanningMappedNetworkDrivesForFullScan" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\14\3895955085" /v "EnabledState" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FeatureManagement\Overrides\14\3895955085" /v "EnabledStateOptions" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Classes\.tx" /v "" /t REG_SZ /d "Parsifal.Program" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Classes\.tx" /v "PerceivedType" /t REG_SZ /d "Image" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKU\DefaultUser\Software\Classes\.tx" /v "Content Type" /t REG_SZ /d "image/TX" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe delete "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" /v "{CA6CC9F1-867A-481E-951E-A28C5E4F01EA}" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /f *>> $logfile 2&gt;&amp;1
+  - "DefaultUser error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\FirstLogon.ps1
+  - $logfile = 'C:\UnattendLogs\FirstLogon.log';
+  - try {
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 38 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "VerboseStatus" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "EnableSecuritySignature" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "DisableDomainCreds" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "EveryoneIncludesAnonymous" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v "LimitBlankPasswordUse" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0" /v "NTLMMinClientSec" /t REG_DWORD /d 536870912 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0" /v "NTLMMinServerSec" /t REG_DWORD /d 536870912 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "EnablePlainTextPassword" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "EnableSecuritySignature" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v "RequireSecuritySignature" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "DontDisplayLastUserName" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LegalNoticeCaption" /t REG_SZ /d "" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LegalNoticeText" /t REG_SZ /d "" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "scforceoption" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ShutdownWithoutLogon" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "undockwithoutlogon" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WinDefend" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "AllowClipboardHistory" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "EnableSmartScreen" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HibernateEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShortcutArrow" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\GraphicsPerfSvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\OneSyncSvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\MessagingService" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\wlpasvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\RetailDemo" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WalletService" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\wisvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\OneSyncSvc_*" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\MessagingService_*" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v "ShippedWithReserves" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNgsc" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteRegistry" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteAssistance" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v "MaintenanceDisabled" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisabledByGroupPolicy" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v "Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableInventory" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableUAR" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" /v "DODownloadMode" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v "DODownloadMode" /t REG_DWORD /d 100 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "SmartScreenEnabled" /t REG_SZ /d "Off" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\SmartScreen" /v "ConfigureAppInstallControlEnabled" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\SmartScreen" /v "ConfigureAppInstallControl" /t REG_SZ /d "Anywhere" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableBehaviorMonitoring" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableIOAVProtection" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableRealtimeMonitoring" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SubmitSamplesConsent" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SpynetReporting" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\MRT" /v "DontOfferThroughWUAU" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\MRT" /v "DontReportInfectionInformation" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "PublishUserActivities" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\TextInput" /v "AllowLinguisticDataCollection" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" /v "DisableLocation" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" /v "DisableLocationScripting" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" /v "DisableSensors" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" /v "DisableWindowsLocationProvider" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" /v "Status" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\lfsvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\FindMyDevice" /v "AllowFindMyDevice" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace" /v "AllowSuggestedAppsInWindowsInkWorkspace" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace" /v "AllowWindowsInkWorkspace" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\PenWorkspace" /v "PenWorkspaceButtonDesiredVisibility" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports" /v "PreventHandwritingErrorReports" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "LimitEnhancedDiagnosticDataWindowsAnalytics" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener" /v "Start" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\dmwappushservice" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\DiagTrack" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\SettingSync" /v "DisableSettingSync" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\SettingSync" /v "DisableSettingSyncUserOverride" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableLibrariesDefaultSaveToOneDrive" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSync" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v "HideSystray" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userDataTasks" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\chat" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\radios" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\bluetoothSync" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "DisallowShaking" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "EnableBalloonTips" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblAuthManager" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\xboxgip" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XboxNetApiSvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoUseStoreOpenWith" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "NoNewAppAlert" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoStartMenuRecommendations" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Explorer" /v "HidePeopleBar" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "AllowOnlineTips" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Network Connections" /v "NC_ShowSharedAccessUI" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingErrorReports" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v "DisabledByGroupPolicy" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\EnhancedStorageDevices" /v "TCGSecurityActivationDisabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneSettings" /v "EnableSync" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceCompatibility" /v "DisableRemoteAssistance" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessAccountInfo" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessCalendar" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessCallHistory" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessCamera" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessContacts" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessEmail" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessLocation" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessMessaging" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessMicrophone" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessMotion" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessNotifications" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessPhone" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessRadios" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessTrustedDevices" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsGetDiagnosticInfo" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBackground" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsSyncWithDevices" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsAccessTasks" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Biometrics" /v "Enabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CredUI" /v "DisablePasswordReveal" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WebClient" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\activity" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\webcam" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCall" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appointments" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\contacts" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\email" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userDataTasks" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\chat" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\phoneCallHistory" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\radios" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\bluetoothSync" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\documentsLibrary" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\picturesLibrary" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\videosLibrary" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\broadFileSystemAccess" /v "Value" /t REG_SZ /d "Deny" /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "TdrDelay" /t REG_DWORD /d 60 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v "LongPathsEnabled" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v "NtfsDisableLastAccessUpdate" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\OneDrive" /v "DisableFileSyncNgsc" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\OneDrive" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - taskkill /f /im OneDrive.exe *>> $logfile 2&gt;&amp;1
+  - %SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\RemoteAssistance" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\MRT" /v "DontOfferThroughWUAU" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WpnUserService_*" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WpnService" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{67144949-5132-4859-8036-a737b43825d8}" /v "EnabledScenarioExecutionLevel" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\WinHttp" /v "DisableWpad" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\WinHttpAutoProxySvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" /v "SearchOrderConfig" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\ScheduledDiagnostics" /v "EnabledExecution" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\ScriptedDiagnosticsProvider\Policy" /v "EnableQueryRemoteServer" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\ScriptedDiagnosticsProvider\Policy" /v "DisableQueryRemoteServer" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\diagsvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\DusmSvc" /v "Start" /t REG_DWORD /d 4 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{3af8b24a-4a18-4f1d-87ef-94494e8b092b}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{5c23dec4-4e8e-4bdb-b0cf-851126b148a0}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{67144949-5132-4859-8036-a737b43825d8}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{6c28c7e5-4269-4dc3-9b92-5ee84a7a1bc4}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{86432a0b-3c7d-4ddf-a89c-172faa90485d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{8af052f9-3da0-4d8f-a228-7ace8c3b1034}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{c295fbdf-34a7-49a7-ace5-3f3ab456d558}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{ebc25cf6-9120-4283-b972-0e5520d0000E}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WDI\{ebc25cf6-9120-4283-b972-0e5520d0000F}" /v "ScenarioExecutionEnabled" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\WindowsMitigation" /v "UserPreference" /t REG_DWORD /d 3 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettings" /t REG_DWORD /d 3 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d 3 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /t REG_DWORD /d 3 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "CompositionPolicy" /t REG_DWORD /d 2 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "ColorizationGlassAttribute" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "EnableAeroPeek" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "EnableWindowColorization" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\Dwm" /v "AccentColor" /t REG_DWORD /d 4282927692 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent" /v "AccentPalette" /t REG_BINARY /d 6B6B6BFF5A5A5AFF4D4D4DFF3A3A3AFF2D2D2DFF1F1F1FFF0F0F0FFF090909FF /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent" /v "AccentColorMenu" /t REG_DWORD /d 4281545523 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent" /v "StartColorMenu" /t REG_DWORD /d 4281150758 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v "DisableAcrylicBackgroundOnLogon" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "PlatformSupportMiracast" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "DxgKrnlVersion" /t REG_DWORD /d 4354 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "MinDxgKrnlVersion" /t REG_DWORD /d 20483 /f *>> $logfile 2&gt;&amp;1
+  - reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "TdrDdiDelay" /t REG_DWORD /d 60 /f *>> $logfile 2&gt;&amp;1
+  - } catch {
+  - "FirstLogon error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
+  - }
+Saved diff to: C:\UnattendLogs\compare_diffs\Original__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
+
+Marker counts (source vs target):
+winget install : source=1 ; target=1
+vivetool : source=1 ; target=1
+Restart-Computer : source=1 ; target=1
+vc_redist : source=1 ; target=1
+Microsoft.WindowsTerminal_Win11.msixbundle : source=1 ; target=1
+Invoke-RestMethod.*api.github.com/repos/thebookisclosed/ViVe/releases/latest : source=0 ; target=0
+
+Check for unescaped & in target blocks (potential XML issues):
+Unescaped & found in block: C:\Windows\Setup\Scripts\FirstLogon.ps1 ; occurrences: 1
+Target file tag counts: open=15 ; close=15
+
+--- End of comparison Original -> Copilot ---
+
+
+===== Comparing Schneegans -> Copilot =====
+
+No missing <File> blocks.
+Per-block line differences (lines in source but not in target):
+Block: C:\Windows\Setup\Scripts\GetWallpaper.ps1
+  - 	$ProgressPreference = 'SilentlyContinue';
+  - 	( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_GetWallpaper.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\SetStartPins.ps1
+  - 	return;
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_SetStartPins.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\SetColorTheme.ps1
+  - 	$params = @{
+  - 		LiteralPath = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize';
+  - 		Force = $true;
+  - 		Type = 'DWord';
+  - 	};
+  - 	Set-ItemProperty @params -Name 'SystemUsesLightTheme' -Value $lightThemeSystem;
+  - 	Set-ItemProperty @params -Name 'AppsUseLightTheme' -Value $lightThemeApps;
+  - 	Set-ItemProperty @params -Name 'ColorPrevalence' -Value $accentColorOnStart;
+  - 	Set-ItemProperty @params -Name 'EnableTransparency' -Value $enableTransparency;
+  - 	Add-Type -AssemblyName 'System.Drawing';
+  - 	$accentColor = [System.Drawing.ColorTranslator]::FromHtml( $htmlAccentColor );
+  - 	function ConvertTo-DWord {
+  - 		param(
+  - 			[System.Drawing.Color]
+  - 			$Color
+  - 		);
+  - 		[byte[]] $bytes = @(
+  - 			$Color.R;
+  - 			$Color.G;
+  - 			$Color.B;
+  - 			$Color.A;
+  - 		);
+  - 		return [System.BitConverter]::ToUInt32( $bytes, 0);
+  - 	}
+  - 	$startColor = [System.Drawing.Color]::FromArgb( 0xD2, $accentColor );
+  - 	Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name 'StartColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+  - 	Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name 'AccentColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+  - 	Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\DWM' -Name 'AccentColor' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+  - 	$params = @{
+  - 		LiteralPath = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent';
+  - 		Name = 'AccentPalette';
+  - 	};
+  - 	$palette = Get-ItemPropertyValue @params;
+  - 	$index = 20;
+  - 	$palette[ $index++ ] = $accentColor.R;
+  - 	$palette[ $index++ ] = $accentColor.G;
+  - 	$palette[ $index++ ] = $accentColor.B;
+  - 	$palette[ $index++ ] = $accentColor.A;
+  - 	Set-ItemProperty @params -Value $palette -Type 'Binary' -Force;
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_SetColorTheme.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\Specialize.ps1
+  - $scripts = @(
+  - 	{
+  - 		reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		Remove-Item -LiteralPath 'C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk', 'C:\Windows\System32\OneDriveSetup.exe', 'C:\Windows\SysWOW64\OneDriveSetup.exe' -ErrorAction 'Continue';
+  - 	};
+  - 	{
+  - 		Remove-Item -LiteralPath 'Registry::HKLM\Software\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate' -Force -ErrorAction 'SilentlyContinue';
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\RemovePackages.ps1';
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\RemoveCapabilities.ps1';
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\RemoveFeatures.ps1';
+  - 	};
+  - 	{
+  - 		net.exe accounts /maxpwage:UNLIMITED;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v SmartScreenEnabled /t REG_SZ /d "Off" /f;
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v ServiceEnabled /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyMalicious /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyPasswordReuse /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyUnsafeApp /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v HideSystray /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+  - 	};
+  - 	{
+  - 		Remove-Item -LiteralPath 'C:\Users\Public\Desktop\Microsoft Edge.lnk' -ErrorAction 'SilentlyContinue' -Verbose;
+  - 	};
+  - 	{
+  - 		auditpol.exe /set /subcategory:"{0CCE922B-69AE-11D9-BED3-505054503030}" /success:enable /failure:enable;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		Set-ExecutionPolicy -Scope 'LocalMachine' -ExecutionPolicy 'RemoteSigned' -Force;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\Software\Policies\Microsoft\Edge" /v HideFirstRunExperience /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v StartupBoostEnabled /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\SetStartPins.ps1';
+  - 	};
+  - 	{
+  - 		try {
+  - 		  $bytes = &amp; 'C:\Windows\Setup\Scripts\GetWallpaper.ps1';
+  - 		  [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\Wallpaper', $bytes );
+  - 		} catch {
+  - 		  $_;
+  - 		}
+  - 	};
+  - 	{
+  - 		try {
+  - 		  $bytes = &amp; 'C:\Windows\Setup\Scripts\GetLockScreenImage.ps1';
+  - 		  [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\LockScreenImage', $bytes );
+  - 		  reg.exe add "HKLM\Software\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v LockScreenImagePath /t REG_SZ /d "C:\Windows\Setup\Scripts\LockScreenImage" /f;
+  - 		} catch {
+  - 		  $_;
+  - 		}
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\unattend-01.ps1';
+  - 	};
+  - 	{
+  - 		reg.exe import "C:\Windows\Setup\Scripts\unattend-02.reg";
+  - 	};
+  - );
+  - &amp; {
+  -   [float] $complete = 0;
+  -   [float] $increment = 100 / $scripts.Count;
+  -   foreach( $script in $scripts ) {
+  -     Write-Progress -Activity 'Running scripts to customize your Windows installation. Do not close this window.' -PercentComplete $complete;
+  -     '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+  -       $str = $script.ToString().Trim() -replace '\s+', ' ';
+  -       $max = 100;
+  -       if( $str.Length -le $max ) {
+  -         $str;
+  -       } else {
+  -         $str.Substring( 0, $max - 1 ) + '&#x2026;';
+  -       }
+  -     );
+  -     $start = [datetime]::Now;
+  -     &amp; $script;
+  -     '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
+  -     "`r`n" * 3;
+  -     $complete += $increment;
+  -   }
+  - } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\Specialize.log";
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\SetWallpaper.ps1
+  - 	using System.Drawing;
+  - 	using System.Runtime.InteropServices;
+  - 	public static class WallpaperSetter {
+  - 		[DllImport("user32.dll")]
+  - 		private static extern bool SetSysColors(
+  - 			int cElements,
+  - 			int[] lpaElements,
+  - 			int[] lpaRgbValues
+  - 		);
+  - 		[DllImport("user32.dll")]
+  - 		private static extern bool SystemParametersInfo(
+  - 			uint uiAction,
+  - 			uint uiParam,
+  - 			string pvParam,
+  - 			uint fWinIni
+  - 		);
+  - 		public static void SetDesktopBackground(Color color) {
+  - 			SystemParametersInfo(20, 0, "", 0);
+  - 			SetSysColors(1, new int[] { 1 }, new int[] { ColorTranslator.ToWin32(color) });
+  - 		}
+  - 		public static void SetDesktopImage(string file) {
+  - 			SystemParametersInfo(20, 0, file, 0);
+  - 		}
+  - 	}
+  - 	param(
+  - 		[string]
+  - 		$HtmlColor
+  - 	);
+  - 	$color = [System.Drawing.ColorTranslator]::FromHtml( $HtmlColor );
+  - 	[WallpaperSetter]::SetDesktopBackground( $color );
+  - 	Set-ItemProperty -Path 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name 'BackgroundType' -Type 'DWord' -Value 1 -Force;
+  - 	Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type 'String' -Value '' -Force;
+  - 	Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Colors' -Name 'Background' -Type 'String' -Value "$($color.R) $($color.G) $($color.B)" -Force;
+  - 	param(
+  - 		[string]
+  - 		$LiteralPath
+  - 	);
+  - 	if( $LiteralPath | Test-Path ) {
+  - 		[WallpaperSetter]::SetDesktopImage( $LiteralPath );
+  - 		Set-ItemProperty -Path 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name 'BackgroundType' -Type 'DWord' -Value 0 -Force;
+  - 		Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type 'String' -Value $LiteralPath -Force;
+  - 	} else {
+  - 		"Cannot use '$LiteralPath' as a desktop wallpaper because that file does not exist.";
+  - 	}
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_SetWallpaper.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\RemovePackages.ps1
+  - 	'Microsoft.Microsoft3DViewer';
+  - 	'Microsoft.BingSearch';
+  - 	'Microsoft.WindowsCamera';
+  - 	'Clipchamp.Clipchamp';
+  - 	'Microsoft.Copilot';
+  - 	'Microsoft.549981C3F5F10';
+  - 	'MicrosoftCorporationII.MicrosoftFamily';
+  - 	'Microsoft.Edge.GameAssist';
+  - 	'Microsoft.GetHelp';
+  - 	'Microsoft.Getstarted';
+  - 	'microsoft.windowscommunicationsapps';
+  - 	'Microsoft.WindowsMaps';
+  - 	'Microsoft.MixedReality.Portal';
+  - 	'Microsoft.BingNews';
+  - 	'Microsoft.MicrosoftOfficeHub';
+  - 	'Microsoft.Office.OneNote';
+  - 	'Microsoft.OutlookForWindows';
+  - 	'Microsoft.MSPaint';
+  - 	'Microsoft.People';
+  - 	'Microsoft.PowerAutomateDesktop';
+  - 	'MicrosoftCorporationII.QuickAssist';
+  - 	'Microsoft.SkypeApp';
+  - 	'Microsoft.ScreenSketch';
+  - 	'Microsoft.MicrosoftSolitaireCollection';
+  - 	'Microsoft.MicrosoftStickyNotes';
+  - 	'MicrosoftTeams';
+  - 	'MSTeams';
+  - 	'Microsoft.Todos';
+  - 	'Microsoft.WindowsSoundRecorder';
+  - 	'Microsoft.Wallet';
+  - 	'Microsoft.Xbox.TCUI';
+  - 	'Microsoft.XboxApp';
+  - 	'Microsoft.XboxGameOverlay';
+  - 	'Microsoft.XboxGamingOverlay';
+  - 	'Microsoft.XboxIdentityProvider';
+  - 	'Microsoft.XboxSpeechToTextOverlay';
+  - 	'Microsoft.GamingApp';
+  - 	'Microsoft.YourPhone';
+  - 	'Microsoft.ZuneMusic';
+  - 	'Microsoft.ZuneVideo';
+  - $logfile = 'C:\Windows\Setup\Scripts\RemovePackages.log';
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress;
+  - 	}
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
+  - 	'Print.Fax.Scan';
+  - 	'Language.Handwriting';
+  - 	'Browser.InternetExplorer';
+  - 	'MathRecognizer';
+  - 	'OneCoreUAP.OneSync';
+  - 	'OpenSSH.Client';
+  - 	'App.Support.QuickAssist';
+  - 	'Language.Speech';
+  - 	'Language.TextToSpeech';
+  - 	'App.StepsRecorder';
+  - 	'Hello.Face.18967';
+  - 	'Hello.Face.Migration.18967';
+  - 	'Hello.Face.20134';
+  - 	'Media.WindowsMediaPlayer';
+  - $logfile = 'C:\Windows\Setup\Scripts\RemoveCapabilities.log';
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress;
+  - 	}
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\DefaultUser.ps1
+  - $scripts = @(
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
+  - 	};
+  - 	{
+  - 		Remove-ItemProperty -LiteralPath 'Registry::HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'OneDriveSetup' -Force -ErrorAction 'Continue';
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Hidden" /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenEnabled" /ve /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenPuaEnabled" /ve /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f;
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v PreventOverride /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		$names = @(
+  - 		  'ContentDeliveryAllowed';
+  - 		  'FeatureManagementEnabled';
+  - 		  'OEMPreInstalledAppsEnabled';
+  - 		  'PreInstalledAppsEnabled';
+  - 		  'PreInstalledAppsEverEnabled';
+  - 		  'SilentInstalledAppsEnabled';
+  - 		  'SoftLandingEnabled';
+  - 		  'SubscribedContentEnabled';
+  - 		  'SubscribedContent-310093Enabled';
+  - 		  'SubscribedContent-338387Enabled';
+  - 		  'SubscribedContent-338388Enabled';
+  - 		  'SubscribedContent-338389Enabled';
+  - 		  'SubscribedContent-338393Enabled';
+  - 		  'SubscribedContent-353694Enabled';
+  - 		  'SubscribedContent-353696Enabled';
+  - 		  'SubscribedContent-353698Enabled';
+  - 		  'SystemPaneSuggestionsEnabled';
+  - 		);
+  - 		foreach( $name in $names ) {
+  - 		  reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v $name /t REG_DWORD /d 0 /f;
+  - 		}
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v TaskbarEndTask /t REG_DWORD /d 1 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t REG_DWORD /d 0 /f;
+  - 	};
+  - 	{
+  - 		reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "UnattendedSetup" /t REG_SZ /d "powershell.exe -WindowStyle \""Hidden\"" -ExecutionPolicy \""Unrestricted\"" -NoProfile -File \""C:\Windows\Setup\Scripts\UserOnce.ps1\""" /f;
+  - 	};
+  - );
+  - &amp; {
+  -   [float] $complete = 0;
+  -   [float] $increment = 100 / $scripts.Count;
+  -   foreach( $script in $scripts ) {
+  -     Write-Progress -Activity 'Running scripts to modify the default user&#x2019;&#x2019;s registry hive. Do not close this window.' -PercentComplete $complete;
+  -     '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+  -       $str = $script.ToString().Trim() -replace '\s+', ' ';
+  -       $max = 100;
+  -       if( $str.Length -le $max ) {
+  -         $str;
+  -       } else {
+  -         $str.Substring( 0, $max - 1 ) + '&#x2026;';
+  -       }
+  -     );
+  -     $start = [datetime]::Now;
+  -     &amp; $script;
+  -     '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
+  -     "`r`n" * 3;
+  -     $complete += $increment;
+  -   }
+  - } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\DefaultUser.log";
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\FirstLogon.ps1
+  - 	{
+  - 		Set-ItemProperty -LiteralPath 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name 'AutoLogonCount' -Type 'DWord' -Force -Value 0;
+  - 	};
+  - 	{
+  - 		@(
+  - 			Get-ChildItem -LiteralPath 'C:\' -Force;
+  - 			Get-ChildItem -LiteralPath 'C:\Users' -Force;
+  - 			Get-ChildItem -LiteralPath 'C:\Users\Default' -Force -Recurse -Depth 2;
+  - 			Get-ChildItem -LiteralPath 'C:\Users\Public' -Force -Recurse -Depth 2;
+  - 			Get-ChildItem -LiteralPath 'C:\ProgramData' -Force;
+  - 		) | Where-Object -FilterScript {
+  - 			$_.Attributes.HasFlag( [System.IO.FileAttributes]::ReparsePoint );
+  - 		} | Remove-Item -Force -Recurse -Verbose;
+  - 	};
+  - 	{
+  - 		cmd.exe /c "rmdir C:\Windows.old";
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\unattend-03.ps1';
+  - 	};
+  - 	{
+  - 		Remove-Item -LiteralPath @(
+  - 		  'C:\Windows\Panther\unattend.xml';
+  - 		  'C:\Windows\Panther\unattend-original.xml';
+  - 		  'C:\Windows\Setup\Scripts\Wifi.xml';
+  - 		) -Force -ErrorAction 'SilentlyContinue' -Verbose;
+  - 	};
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\GetLockScreenImage.ps1
+  - 	$ProgressPreference = 'SilentlyContinue';
+  - 	( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_GetLockScreenImage.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\UserOnce.ps1
+  - $scripts = @(
+  - 	{
+  - 		Set-WinHomeLocation -GeoId 137;
+  - 	};
+  - 	{
+  - 		Get-AppxPackage -Name 'Microsoft.Windows.Ai.Copilot.Provider' | Remove-AppxPackage;
+  - 	};
+  - 	{
+  - 		@(
+  - 		  Get-ChildItem -LiteralPath $env:USERPROFILE -Force -Recurse -Depth 2;
+  - 		) | Where-Object -FilterScript {
+  - 			$_.Attributes.HasFlag( [System.IO.FileAttributes]::ReparsePoint );
+  - 		} | Remove-Item -Force -Recurse -Verbose;
+  - 	};
+  - 	{
+  - 		Remove-Item -LiteralPath "${env:USERPROFILE}\Desktop\Microsoft Edge.lnk" -ErrorAction 'SilentlyContinue' -Verbose;
+  - 	};
+  - 	{
+  - 		Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'LaunchTo' -Type 'DWord' -Value 1;
+  - 	};
+  - 	{
+  - 		Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 1;
+  - 	};
+  - 	{
+  - 		New-Item -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Force;
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
+  - 		New-Item -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Force;
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
+  - 	};
+  - 	{
+  - 		Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'VisiblePlaces' -Value $( [convert]::FromBase64String('ztU0LVr6Q0WC8iLm6vd3PC+zZ+PeiVVDv85h83sYqTe8JIoUDNaJQqCAbtm7okiCIAYLsFF/MkyqHjTMVH9zFUSBdf4NCK5Ci9o07Ze2Y5RKsL10SvloT4vWQ5gHHai8oAc/OArogEywWobbhF28TYYIc1KqUUNCn3sndlhGWdTFpbNChn30QoCkk/rKeoi1') ) -Type 'Binary';
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\SetColorTheme.ps1';
+  - 	};
+  - 	{
+  - 		&amp; 'C:\Windows\Setup\Scripts\SetWallpaper.ps1';
+  - 	};
+  - 	{
+  - 		Get-Process -Name 'explorer' -ErrorAction 'SilentlyContinue' | Where-Object -FilterScript {
+  - 			$_.SessionId -eq ( Get-Process -Id $PID ).SessionId;
+  - 		} | Stop-Process -Force;
+  - 	};
+  - );
+  - &amp; {
+  -   [float] $complete = 0;
+  -   [float] $increment = 100 / $scripts.Count;
+  -   foreach( $script in $scripts ) {
+  -     Write-Progress -Activity 'Running scripts to configure this user account. Do not close this window.' -PercentComplete $complete;
+  -     '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+  -       $str = $script.ToString().Trim() -replace '\s+', ' ';
+  -       $max = 100;
+  -       if( $str.Length -le $max ) {
+  -         $str;
+  -       } else {
+  -         $str.Substring( 0, $max - 1 ) + '&#x2026;';
+  -       }
+  -     );
+  -     $start = [datetime]::Now;
+  -     &amp; $script;
+  -     '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
+  -     "`r`n" * 3;
+  -     $complete += $increment;
+  -   }
+  - } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "$env:TEMP\UserOnce.log";
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
+Block: C:\Windows\Setup\Scripts\RemoveFeatures.ps1
+  - 	'MediaPlayback';
+  - 	'Microsoft-RemoteDesktopConnection';
+  - 	'Recall';
+  - $logfile = 'C:\Windows\Setup\Scripts\RemoveFeatures.log';
+  - 	$installed = &amp; $getCommand;
+  - 	foreach( $selector in $selectors ) {
+  - 		$result = [ordered] @{
+  - 			Selector = $selector;
+  - 		};
+  - 		$found = $installed | Where-Object -FilterScript $filterCommand;
+  - 		if( $found ) {
+  - 			$result.Output = $found | &amp; $removeCommand;
+  - 			if( $? ) {
+  - 				$result.Message = "$type removed.";
+  - 			} else {
+  - 				$result.Message = "$type not removed.";
+  - 				$result.Error = $Error[0];
+  - 			}
+  - 		} else {
+  - 			$result.Message = "$type not installed.";
+  - 		}
+  - 		$result | ConvertTo-Json -Depth 3 -Compress;
+  - 	}
+Saved diff to: C:\UnattendLogs\compare_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
+
+Marker counts (source vs target):
+winget install : source=0 ; target=1
+vivetool : source=0 ; target=1
+Restart-Computer : source=0 ; target=1
+vc_redist : source=0 ; target=1
+Microsoft.WindowsTerminal_Win11.msixbundle : source=0 ; target=1
+Invoke-RestMethod.*api.github.com/repos/thebookisclosed/ViVe/releases/latest : source=0 ; target=0
+
+Check for unescaped & in target blocks (potential XML issues):
+Unescaped & found in block: C:\Windows\Setup\Scripts\FirstLogon.ps1 ; occurrences: 1
+Target file tag counts: open=15 ; close=15
+
+--- End of comparison Schneegans -> Copilot ---
+
