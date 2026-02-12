@@ -1,6 +1,6 @@
-﻿2026-02-13 04:04:57 [INFO] Backup created: C:\UnattendLogs\autounattend_Copilot.xml.bak
-2026-02-13 04:04:57 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
-2026-02-13 04:04:57 [INFO] Inserted 104 lines into C:\Windows\Setup\Scripts\DefaultUser.ps1
+﻿2026-02-13 04:13:53 [INFO] Backup created: C:\UnattendLogs\autounattend_Copilot.xml.bak
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 104 lines into C:\Windows\Setup\Scripts\DefaultUser.ps1
   + reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
   + reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
   + reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f *>> $logfile 2&gt;&amp;1
@@ -105,8 +105,8 @@
   + reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" /f *>> $logfile 2&gt;&amp;1
   + reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" /f *>> $logfile 2&gt;&amp;1
   + "DefaultUser error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
-2026-02-13 04:04:57 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
-2026-02-13 04:04:57 [INFO] Inserted 205 lines into C:\Windows\Setup\Scripts\FirstLogon.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 205 lines into C:\Windows\Setup\Scripts\FirstLogon.ps1
   + reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d 38 /f *>> $logfile 2&gt;&amp;1
   + reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
   + reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "VerboseStatus" /t REG_DWORD /d 1 /f *>> $logfile 2&gt;&amp;1
@@ -312,8 +312,8 @@
   + reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "MinDxgKrnlVersion" /t REG_DWORD /d 20483 /f *>> $logfile 2&gt;&amp;1
   + reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "TdrDdiDelay" /t REG_DWORD /d 60 /f *>> $logfile 2&gt;&amp;1
   + "FirstLogon error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
-2026-02-13 04:04:57 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
-2026-02-13 04:04:57 [INFO] Inserted 36 lines into C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 36 lines into C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
   + 'Print.Fax.Scan';
   + 'Language.Handwriting';
   + 'Browser.InternetExplorer';
@@ -350,8 +350,8 @@
   + }
   + } catch {
   + "Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 25 lines into C:\Windows\Setup\Scripts\RemoveFeatures.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 25 lines into C:\Windows\Setup\Scripts\RemoveFeatures.ps1
   + 'MediaPlayback';
   + 'Microsoft-RemoteDesktopConnection';
   + 'Recall';
@@ -377,8 +377,8 @@
   + }
   + } catch {
   + "Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 62 lines into C:\Windows\Setup\Scripts\RemovePackages.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 62 lines into C:\Windows\Setup\Scripts\RemovePackages.ps1
   + 'Microsoft.Microsoft3DViewer';
   + 'Microsoft.BingSearch';
   + 'Microsoft.WindowsCamera';
@@ -441,14 +441,14 @@
   + }
   + } catch {
   + "Error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 4 lines into C:\Windows\Setup\Scripts\Specialize.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 4 lines into C:\Windows\Setup\Scripts\Specialize.ps1
   + &amp; "C:\Windows\Setup\Scripts\RemovePackages.ps1" *>> $logfile 2&gt;&amp;1
   + &amp; "C:\Windows\Setup\Scripts\RemoveCapabilities.ps1" *>> $logfile 2&gt;&amp;1
   + &amp; "C:\Windows\Setup\Scripts\RemoveFeatures.ps1" *>> $logfile 2&gt;&amp;1
   + "Specialize error: $($_.Exception.Message)" | Out-File -FilePath $logfile -Append -Encoding utf8
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 11 lines into C:\Windows\Setup\Scripts\UserOnce.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Original__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 11 lines into C:\Windows\Setup\Scripts\UserOnce.ps1
   + Invoke-WebRequest -Uri $wingetUrl -OutFile "$env:TEMP\winget.msixbundle" -UseBasicParsing *>> $logfile 2&gt;&amp;1
   + Add-AppxPackage -Path "$env:TEMP\winget.msixbundle" *>> $logfile 2&gt;&amp;1
   + winget install --id $app --silent --accept-package-agreements --accept-source-agreements *>> $logfile 2&gt;&amp;1
@@ -460,8 +460,8 @@
   + Expand-Archive -Path "$env:TEMP\ViVeTool.zip" -DestinationPath $vivetoolPath -Force *>> $logfile 2&gt;&amp;1
   + &amp; "$vivetoolPath\vivetool.exe" /enable /id:$id *>> $logfile 2&gt;&amp;1
   + Restart-Computer -Force *>> $logfile 2&gt;&amp;1
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 88 lines into C:\Windows\Setup\Scripts\DefaultUser.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_DefaultUser.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 88 lines into C:\Windows\Setup\Scripts\DefaultUser.ps1
   + $scripts = @(
   + {
   + reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
@@ -550,8 +550,8 @@
   + $complete += $increment;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\DefaultUser.log";
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 28 lines into C:\Windows\Setup\Scripts\FirstLogon.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_FirstLogon.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 28 lines into C:\Windows\Setup\Scripts\FirstLogon.ps1
   + {
   + Set-ItemProperty -LiteralPath 'Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name 'AutoLogonCount' -Type 'DWord' -Force -Value 0;
   + };
@@ -580,16 +580,16 @@
   + ) -Force -ErrorAction 'SilentlyContinue' -Verbose;
   + };
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\FirstLogon.log";
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_GetLockScreenImage.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 2 lines into C:\Windows\Setup\Scripts\GetLockScreenImage.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_GetLockScreenImage.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 2 lines into C:\Windows\Setup\Scripts\GetLockScreenImage.ps1
   + $ProgressPreference = 'SilentlyContinue';
   + ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_GetWallpaper.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 2 lines into C:\Windows\Setup\Scripts\GetWallpaper.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_GetWallpaper.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 2 lines into C:\Windows\Setup\Scripts\GetWallpaper.ps1
   + $ProgressPreference = 'SilentlyContinue';
   + ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 35 lines into C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveCapabilities.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 35 lines into C:\Windows\Setup\Scripts\RemoveCapabilities.ps1
   + 'Print.Fax.Scan';
   + 'Language.Handwriting';
   + 'Browser.InternetExplorer';
@@ -625,8 +625,8 @@
   + $result | ConvertTo-Json -Depth 3 -Compress;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 24 lines into C:\Windows\Setup\Scripts\RemoveFeatures.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemoveFeatures.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 24 lines into C:\Windows\Setup\Scripts\RemoveFeatures.ps1
   + 'MediaPlayback';
   + 'Microsoft-RemoteDesktopConnection';
   + 'Recall';
@@ -651,8 +651,8 @@
   + $result | ConvertTo-Json -Depth 3 -Compress;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 61 lines into C:\Windows\Setup\Scripts\RemovePackages.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_RemovePackages.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 61 lines into C:\Windows\Setup\Scripts\RemovePackages.ps1
   + 'Microsoft.Microsoft3DViewer';
   + 'Microsoft.BingSearch';
   + 'Microsoft.WindowsCamera';
@@ -714,8 +714,8 @@
   + $result | ConvertTo-Json -Depth 3 -Compress;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetColorTheme.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 39 lines into C:\Windows\Setup\Scripts\SetColorTheme.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetColorTheme.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 39 lines into C:\Windows\Setup\Scripts\SetColorTheme.ps1
   + $params = @{
   + LiteralPath = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize';
   + Force = $true;
@@ -755,11 +755,11 @@
   + $palette[ $index++ ] = $accentColor.B;
   + $palette[ $index++ ] = $accentColor.A;
   + Set-ItemProperty @params -Value $palette -Type 'Binary' -Force;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetStartPins.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 1 lines into C:\Windows\Setup\Scripts\SetStartPins.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetStartPins.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 1 lines into C:\Windows\Setup\Scripts\SetStartPins.ps1
   + return;
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetWallpaper.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 44 lines into C:\Windows\Setup\Scripts\SetWallpaper.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_SetWallpaper.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 44 lines into C:\Windows\Setup\Scripts\SetWallpaper.ps1
   + using System.Drawing;
   + using System.Runtime.InteropServices;
   + public static class WallpaperSetter {
@@ -804,8 +804,8 @@
   + } else {
   + "Cannot use '$LiteralPath' as a desktop wallpaper because that file does not exist.";
   + }
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 120 lines into C:\Windows\Setup\Scripts\Specialize.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_Specialize.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 120 lines into C:\Windows\Setup\Scripts\Specialize.ps1
   + $scripts = @(
   + {
   + reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f;
@@ -926,8 +926,8 @@
   + $complete += $increment;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\Specialize.log";
-2026-02-13 04:04:58 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
-2026-02-13 04:04:58 [INFO] Inserted 88 lines into C:\Windows\Setup\Scripts\UserOnce.ps1
+2026-02-13 04:13:53 [INFO] Processing diff: C:\UnattendLogs\verify_diffs\Schneegans__C__Windows_Setup_Scripts_UserOnce.ps1.diff.txt
+2026-02-13 04:13:53 [INFO] Inserted 88 lines into C:\Windows\Setup\Scripts\UserOnce.ps1
   + $scripts = @(
   + {
   + Set-WinHomeLocation -GeoId 137;
@@ -1016,6 +1016,6 @@
   + $complete += $increment;
   + }
   + } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "$env:TEMP\UserOnce.log";
-2026-02-13 04:04:58 [INFO] Wrote restored file: C:\UnattendLogs\autounattend_Copilot_restored.xml
-2026-02-13 04:04:58 [INFO] Total inserted lines: 979
-2026-02-13 04:04:58 [INFO] XML parse OK for C:\UnattendLogs\autounattend_Copilot_restored.xml
+2026-02-13 04:13:54 [INFO] Wrote restored file: C:\UnattendLogs\autounattend_Copilot_restored.xml
+2026-02-13 04:13:54 [INFO] Total inserted lines: 979
+2026-02-13 04:13:54 [INFO] XML parse OK for C:\UnattendLogs\autounattend_Copilot_restored.xml
