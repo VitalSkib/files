@@ -661,76 +661,113 @@
             "C:\Windows\Setup\Scripts\Specialize.log";
         </File>
 		<File path="C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1">
-            "Starting Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath
-            "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
-            trap {
-            "ERROR in Specialize_Tweaks.ps1 : $($_.Exception.Message)" | Out-File -FilePath
-            "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
+        "Starting Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
+
+        trap {
+            "ERROR in Specialize_Tweaks.ps1 : $($_.Exception.Message)" | Out-File -FilePath "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
             continue
-            }
-            # --- Explorer Navigation Pane Cleanup (Network, Gallery, Home) ---
-            $logFile = "C:\Windows\Setup\Scripts\Specialize_Tweaks.log"
-            function Log($m) {
+        }
+
+        # --- Logging helper ---
+        $logFile = "C:\Windows\Setup\Scripts\Specialize_Tweaks.log"
+        function Log($m) {
             $t = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             Add-Content -Path $logFile -Value "$t`t$m"
-            }
+        }
 
-            try {
-            # Hide/Remove Network
+        try {
+            # 1. Explorer Navigation Pane Cleanup (Network, Gallery, Home)
             $networkCLSID = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
-            reg.exe delete reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-            reg.exe delete reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-            reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null Log "Network CLSID processed: $networkCLSID"
+            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
+            reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
+            reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null
+            Log "Network CLSID processed: $networkCLSID"
 
-            # Remove Gallery
             $galleryCLSID = "{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}"
-            reg.exe delete reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
+            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
             Log "Gallery CLSID removed: $galleryCLSID"
 
-            # Hide Home via HiddenByDefault and remove WOW6432Node duplicate
             $homeCLSID = "{f874310e-b6b7-47dc-bc84-b9e6b38f5903}"
-            reg.exe add reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
-            reg.exe delete reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
+            reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
             Log "Home hidden via HiddenByDefault and WOW6432Node duplicate removed: $homeCLSID"
-            }
-            catch {
+        }
+        catch {
             Log "Error in navigation pane cleanup: $_"
-            }
+        }
 
-            # Restart Explorer to apply changes
+        # 2. System-wide Explorer Defaults (This PC by default)
+        reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"
+        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
+        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
+        reg.exe unload "HKU\DefaultUser"
+
+        # 3. Taskbar and Start Menu Tweaks
+        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 1 /f
+
+        # 4. System Personalization (No Lock Screen and No Blur)
+        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f
+        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v DisableAcrylicBackgroundOnLogon /t REG_DWORD /d 1 /f
+
+        # 5. Power Management and Storage Optimization
+        powercfg.exe /hibernate off
+        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
+
+        # 6. Desktop Icons (Remove Shortcut Arrows) - automated download and apply
+        try {
+            Log "Start: apply blank shortcut arrow icon"
+
+            # Remove existing override if present
+            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /f 2>$null
+            Log "Removed existing Shell Icons\\29 (if present)"
+
+            # Download blank.ico
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $url = "https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/blank.ico"
+            $dest = "C:\Windows\System32\blank.ico"
+
             try {
-            Stop-Process -Name explorer -Force
-            Start-Process explorer.exe
-            Log "Explorer restarted"
+                Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop
+                Log "Downloaded blank.ico via Invoke-WebRequest to $dest"
             }
             catch {
-            Log "Error restarting Explorer: $_"
+                try {
+                    Start-BitsTransfer -Source $url -Destination $dest -ErrorAction Stop
+                    Log "Downloaded blank.ico via BITS to $dest"
+                }
+                catch {
+                    throw "Failed to download blank.ico: $_"
+                }
             }
 
-            # 2. System-wide Explorer Defaults (This PC by default)
-            reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT" reg.exe add
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
-			
-			# Ensure Details pane enabled for DefaultUser (applies to new profiles)
-			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /f reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
-            reg.exe unload "HKU\DefaultUser"
+            if ((Test-Path $dest) -and ((Get-Item $dest).Length -gt 0)) {
+                Log "blank.ico exists and has size $((Get-Item $dest).Length) bytes"
+            }
+            else {
+                throw "blank.ico missing or empty after download"
+            }
 
-            # 3. Taskbar and Start Menu Tweaks
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 1 /f
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d $dest /f
+            Log "Registry updated: Shell Icons\\29 -> $dest"
 
-            # 4. Desktop Icons (Remove Shortcut Arrows)
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d "shell32.dll,-50" /f
+            # Immediate apply (optional). If you will reboot later, you can comment this block out.
+            try {
+                ie4uinit.exe -ClearIconCache
+                Stop-Process -Name explorer -Force
+                Start-Process explorer.exe
+                Log "Icon cache cleared and Explorer restarted to apply change immediately"
+            }
+            catch {
+                Log "Warning: immediate apply failed: $_"
+            }
 
-            # 5. System Personalization (No Lock Screen and No Blur)
-            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v
-            DisableAcrylicBackgroundOnLogon /t REG_DWORD /d 1 /f
+            Log "Finished applying blank shortcut arrow icon"
+        }
+        catch {
+            Log "Error in shortcut arrow apply block: $_"
+        }
 
-            # 6. Power Management and Storage Optimization
-            powercfg.exe /hibernate off reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v
-            ShippedWithReserves /t REG_DWORD /d 0 /f
-
-            "Finished Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath
-            "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
+        "Finished Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
         </File>
 		<File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
             "Starting UserOnce.ps1 at $(Get-Date)" | Out-File -FilePath
