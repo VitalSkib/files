@@ -759,6 +759,9 @@ $scripts = @(
         &amp; 'C:\Windows\Setup\Scripts\SetColorTheme.ps1';
     };
     {
+        &amp; 'C:\Windows\Setup\Scripts\SetWallpaper.ps1';
+    };
+    {
         Get-Process -Name 'explorer' -ErrorAction 'SilentlyContinue' | Where-Object -FilterScript {
             $_.SessionId -eq ( Get-Process -Id $PID ).SessionId;
         } | Stop-Process -Force;
