@@ -712,29 +712,24 @@
             # Hide/Remove Network
             $networkCLSID = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
             reg.exe delete
-            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID"
-            /f | Out-Null
+            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
             reg.exe delete
-            "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID"
-            /f | Out-Null
+            reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
             reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null
             Log "Network CLSID processed: $networkCLSID"
 
             # Remove Gallery
             $galleryCLSID = "{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}"
             reg.exe delete
-            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID"
-            /f | Out-Null
+            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
             Log "Gallery CLSID removed: $galleryCLSID"
 
             # Hide Home via HiddenByDefault and remove WOW6432Node duplicate
             $homeCLSID = "{f874310e-b6b7-47dc-bc84-b9e6b38f5903}"
             reg.exe add
-            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID"
-            /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
             reg.exe delete
-            "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID"
-            /f | Out-Null
+            reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
             Log "Home hidden via HiddenByDefault and WOW6432Node duplicate removed: $homeCLSID"
             }
             catch {
@@ -754,8 +749,8 @@
             # 2. System-wide Explorer Defaults (This PC by default)
             reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"
             reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            LaunchTo /t REG_DWORD /d 1 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
+			
 			# Ensure Details pane enabled for DefaultUser (applies to new profiles)
 			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /f
 			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
