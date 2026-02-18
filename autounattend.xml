@@ -756,6 +756,9 @@
             reg.exe add
             "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
             LaunchTo /t REG_DWORD /d 1 /f
+			# Ensure Details pane enabled for DefaultUser (applies to new profiles)
+			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /f
+			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
             reg.exe unload "HKU\DefaultUser"
 
             # 3. Taskbar and Start Menu Tweaks
