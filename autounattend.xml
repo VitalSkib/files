@@ -362,37 +362,72 @@
                 return;
             }
 
-            # Clear pinned tiles
+            # Clear pinned tiles (PolicyManager for device-wide default)
             $key = 'Registry::HKLM\SOFTWARE\Microsoft\PolicyManager\current\device\Start';
             New-Item -Path $key -ItemType 'Directory' -ErrorAction 'SilentlyContinue';
             Set-ItemProperty -LiteralPath $key -Name 'ConfigureStartPins' -Value $json -Type 'String';
 
+            # Load DefaultUser hive to apply HKCU-equivalents for new users
+            reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT" 2>$null
+
+            # -------------------------
             # Hide Recommended section
+            # -------------------------
+            # Per-user
             reg.exe add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v HideRecommendedSection /t REG_DWORD /d 1 /f
+            # New-user (DefaultUser hive)
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v HideRecommendedSection /t REG_DWORD /d 1 /f
+            # Machine-wide policy
             reg.exe add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v HideRecommendedSection /t REG_DWORD /d 1 /f
+            # PolicyManager entries
             reg.exe add "HKLM\Software\Microsoft\PolicyManager\current\device\Start" /v HideRecommendedSection /t REG_DWORD /d 1 /f
             reg.exe add "HKLM\Software\Microsoft\PolicyManager\current\device\Education" /v IsEducationEnvironment /t REG_DWORD /d 1 /f
 
+            # -------------------------
             # Disable recently added apps
+            # -------------------------
             reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v ShowRecentList /t REG_DWORD /d 0 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Start" /v ShowRecentList /t REG_DWORD /d 0 /f
 
+            # -------------------------
             # Disable most used apps
+            # -------------------------
             reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v ShowFrequentList /t REG_DWORD /d 0 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Start" /v ShowFrequentList /t REG_DWORD /d 0 /f
 
+            # -------------------------
             # Disable recommended files and recently opened items
+            # -------------------------
             reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackDocs /t REG_DWORD /d 0 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackDocs /t REG_DWORD /d 0 /f
 
+            # -------------------------
             # Disable tips, shortcuts, new apps recommendations
+            # -------------------------
             reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_IrisRecommendations /t REG_DWORD /d 0 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_IrisRecommendations /t REG_DWORD /d 0 /f
 
-            # Keep account-related notifications ENABLED (do not disable Start_AccountNotifications)
+            # -------------------------
+            # Keep account-related notifications ENABLED for users (ensure new users get it)
+            # -------------------------
+            reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_AccountNotifications /t REG_DWORD /d 1 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_AccountNotifications /t REG_DWORD /d 1 /f
 
-            # Disable Bing search results in Start
+            # -------------------------
+            # Disable Bing search results in Start (policies)
+            # -------------------------
             reg.exe add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f
             reg.exe add "HKLM\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f
 
-            # Switch Start menu view to Grid
+            # -------------------------
+            # Switch Start menu view to Grid (per-user and new-user)
+            # -------------------------
             reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\Start" /v StartView /t REG_DWORD /d 1 /f
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Start" /v StartView /t REG_DWORD /d 1 /f
+
+            # Unload DefaultUser hive
+            reg.exe unload "HKU\DefaultUser" 2>$null
         </File>
 		<File path="C:\Windows\Setup\Scripts\SetColorTheme.ps1">
             $lightThemeSystem = 0;
@@ -608,8 +643,7 @@
                     reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v PUAProtection /t REG_DWORD /d 0 /f;
                 };
                 {
-                    # Disable UAC completely (commented out to avoid breaking apps)
-                    # reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
+                    reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
                 };
                 {
                     reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
