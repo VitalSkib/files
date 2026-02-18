@@ -28,27 +28,33 @@
 			<RunSynchronous>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD
+                        /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>2</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t
+                        REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>3</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD
+                        /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>4</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD
+                        /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>5</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t
+                        REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>6</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD
+                        /d 1 /f</Path>
 				</RunSynchronousCommand>
 			</RunSynchronous>
 		</component>
@@ -64,11 +70,15 @@
 			<RunSynchronous>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -NoProfile -Command "$xml = [xml]::new(); $xml.Load('C:\Windows\Panther\unattend.xml'); $sb = [scriptblock]::Create( $xml.unattend.Extensions.ExtractScript ); Invoke-Command -ScriptBlock $sb -ArgumentList $xml;"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -NoProfile -Command "$xml =
+                        [xml]::new(); $xml.Load('C:\Windows\Panther\unattend.xml'); $sb =
+                        [scriptblock]::Create( $xml.unattend.Extensions.ExtractScript );
+                        Invoke-Command -ScriptBlock $sb -ArgumentList $xml;"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>2</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\Specialize.ps1"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted"
+                        -NoProfile -File "C:\Windows\Setup\Scripts\Specialize.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>3</Order>
@@ -76,11 +86,13 @@
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>4</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\DefaultUser.ps1"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted"
+                        -NoProfile -File "C:\Windows\Setup\Scripts\DefaultUser.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>5</Order>
-					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -NoProfile -File "C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1"</Path>
+					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -NoProfile
+                        -File "C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>6</Order>
@@ -130,794 +142,985 @@
 			<FirstLogonCommands>
 				<SynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<CommandLine>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\FirstLogon.ps1"</CommandLine>
+					<CommandLine>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy
+                        "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\FirstLogon.ps1"</CommandLine>
 				</SynchronousCommand>
 			</FirstLogonCommands>
 		</component>
 	</settings>
 	<Extensions xmlns="https://schneegans.de/windows/unattend-generator/">
 		<ExtractScript>
-param(
-    [xml] $Document
-);
+            param(
+            [xml] $Document
+            );
 
-foreach( $file in $Document.unattend.Extensions.File ) {
-    $path = [System.Environment]::ExpandEnvironmentVariables( $file.GetAttribute( 'path' ) );
-    mkdir -Path( $path | Split-Path -Parent ) -ErrorAction 'SilentlyContinue';
-    $encoding = switch( [System.IO.Path]::GetExtension( $path ) ) {
-        { $_ -in '.ps1', '.xml' } { [System.Text.Encoding]::UTF8; }
-        { $_ -in '.reg', '.vbs', '.js' } { [System.Text.UnicodeEncoding]::new( $false, $true ); }
-        default { [System.Text.Encoding]::Default; }
-    };
-    try {
-        $bytes = $encoding.GetPreamble() + $encoding.GetBytes( $file.InnerText.Trim() );
-        [System.IO.File]::WriteAllBytes( $path, $bytes );
-        "Created file: $path with encoding $($encoding.EncodingName)" | Out-File -FilePath "C:\Windows\Setup\Scripts\ExtractScript.log" -Append
-    } catch {
-        "ERROR creating file $path : $($_.Exception.Message)" | Out-File -FilePath "C:\Windows\Setup\Scripts\ExtractScript-errors.log" -Append
-    }
-}
+            foreach( $file in $Document.unattend.Extensions.File ) {
+            $path = [System.Environment]::ExpandEnvironmentVariables( $file.GetAttribute( 'path' )
+            );
+            mkdir -Path( $path | Split-Path -Parent ) -ErrorAction 'SilentlyContinue';
+            $encoding = switch( [System.IO.Path]::GetExtension( $path ) ) {
+            { $_ -in '.ps1', '.xml' } { [System.Text.Encoding]::UTF8; }
+            { $_ -in '.reg', '.vbs', '.js' } { [System.Text.UnicodeEncoding]::new( $false, $true );
+            }
+            default { [System.Text.Encoding]::Default; }
+            };
+            try {
+            $bytes = $encoding.GetPreamble() + $encoding.GetBytes( $file.InnerText.Trim() );
+            [System.IO.File]::WriteAllBytes( $path, $bytes );
+            "Created file: $path with encoding $($encoding.EncodingName)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\ExtractScript.log" -Append
+            } catch {
+            "ERROR creating file $path : $($_.Exception.Message)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\ExtractScript-errors.log" -Append
+            }
+            }
         </ExtractScript>
 		<File path="C:\Windows\Setup\Scripts\RemovePackages.ps1">
-$selectors = @(
-    'Microsoft.Microsoft3DViewer';
-    'Microsoft.BingSearch';
-    'Microsoft.WindowsCamera';
-    'Clipchamp.Clipchamp';
-    'Microsoft.Copilot';
-    'Microsoft.549981C3F5F10';
-    'MicrosoftCorporationII.MicrosoftFamily';
-    'Microsoft.Edge.GameAssist';
-    'Microsoft.GetHelp';
-    'Microsoft.Getstarted';
-    'microsoft.windowscommunicationsapps';
-    'Microsoft.WindowsMaps';
-    'Microsoft.MixedReality.Portal';
-    'Microsoft.BingNews';
-    'Microsoft.MicrosoftOfficeHub';
-    'Microsoft.Office.OneNote';
-    'Microsoft.OutlookForWindows';
-    'Microsoft.MSPaint';
-    'Microsoft.People';
-    'Microsoft.PowerAutomateDesktop';
-    'MicrosoftCorporationII.QuickAssist';
-    'Microsoft.SkypeApp';
-    'Microsoft.ScreenSketch';
-    'Microsoft.MicrosoftSolitaireCollection';
-    'Microsoft.MicrosoftStickyNotes';
-    'MicrosoftTeams';
-    'MSTeams';
-    'Microsoft.Todos';
-    'Microsoft.WindowsSoundRecorder';
-    'Microsoft.Wallet';
-    'Microsoft.Xbox.TCUI';
-    'Microsoft.XboxApp';
-    'Microsoft.XboxGameOverlay';
-    'Microsoft.XboxGamingOverlay';
-    'Microsoft.XboxIdentityProvider';
-    'Microsoft.XboxSpeechToTextOverlay';
-    'Microsoft.GamingApp';
-    'Microsoft.YourPhone';
-    'Microsoft.ZuneMusic';
-    'Microsoft.ZuneVideo';
-);
-$getCommand = {
-  Get-AppxProvisionedPackage -Online;
-};
-$filterCommand = {
-  $_.DisplayName -eq $selector;
-};
-$removeCommand = {
-  [CmdletBinding()]
-  param(
-    [Parameter( Mandatory, ValueFromPipeline )]
-    $InputObject
-  );
-  process {
-    $InputObject | Remove-AppxProvisionedPackage -AllUsers -Online -ErrorAction 'Continue';
-  }
-};
-$type = 'Package';
-$logfile = 'C:\Windows\Setup\Scripts\RemovePackages.log';
-&amp; {
-    $installed = &amp; $getCommand;
-    foreach( $selector in $selectors ) {
-        $result = [ordered] @{
+            $selectors = @(
+            'Microsoft.Microsoft3DViewer';
+            'Microsoft.BingSearch';
+            'Microsoft.WindowsCamera';
+            'Clipchamp.Clipchamp';
+            'Microsoft.Copilot';
+            'Microsoft.549981C3F5F10';
+            'MicrosoftCorporationII.MicrosoftFamily';
+            'Microsoft.Edge.GameAssist';
+            'Microsoft.GetHelp';
+            'Microsoft.Getstarted';
+            'microsoft.windowscommunicationsapps';
+            'Microsoft.WindowsMaps';
+            'Microsoft.MixedReality.Portal';
+            'Microsoft.BingNews';
+            'Microsoft.MicrosoftOfficeHub';
+            'Microsoft.Office.OneNote';
+            'Microsoft.OutlookForWindows';
+            'Microsoft.MSPaint';
+            'Microsoft.People';
+            'Microsoft.PowerAutomateDesktop';
+            'MicrosoftCorporationII.QuickAssist';
+            'Microsoft.SkypeApp';
+            'Microsoft.ScreenSketch';
+            'Microsoft.MicrosoftSolitaireCollection';
+            'Microsoft.MicrosoftStickyNotes';
+            'MicrosoftTeams';
+            'MSTeams';
+            'Microsoft.Todos';
+            'Microsoft.WindowsSoundRecorder';
+            'Microsoft.Wallet';
+            'Microsoft.Xbox.TCUI';
+            'Microsoft.XboxApp';
+            'Microsoft.XboxGameOverlay';
+            'Microsoft.XboxGamingOverlay';
+            'Microsoft.XboxIdentityProvider';
+            'Microsoft.XboxSpeechToTextOverlay';
+            'Microsoft.GamingApp';
+            'Microsoft.YourPhone';
+            'Microsoft.ZuneMusic';
+            'Microsoft.ZuneVideo';
+            );
+            $getCommand = {
+            Get-AppxProvisionedPackage -Online;
+            };
+            $filterCommand = {
+            $_.DisplayName -eq $selector;
+            };
+            $removeCommand = {
+            [CmdletBinding()]
+            param(
+            [Parameter( Mandatory, ValueFromPipeline )]
+            $InputObject
+            );
+            process {
+            $InputObject | Remove-AppxProvisionedPackage -AllUsers -Online -ErrorAction 'Continue';
+            }
+            };
+            $type = 'Package';
+            $logfile = 'C:\Windows\Setup\Scripts\RemovePackages.log';
+            &amp; {
+            $installed = &amp; $getCommand;
+            foreach( $selector in $selectors ) {
+            $result = [ordered] @{
             Selector = $selector;
-        };
-        $found = $installed | Where-Object -FilterScript $filterCommand;
-        if( $found ) {
+            };
+            $found = $installed | Where-Object -FilterScript $filterCommand;
+            if( $found ) {
             $result.Output = $found | &amp; $removeCommand;
             if( $? ) {
-                $result.Message = "$type removed.";
+            $result.Message = "$type removed.";
             } else {
-                $result.Message = "$type not removed.";
-                $result.Error = $Error[0];
+            $result.Message = "$type not removed.";
+            $result.Error = $Error[0];
             }
-        } else {
+            } else {
             $result.Message = "$type not installed.";
-        }
-        $result | ConvertTo-Json -Depth 3 -Compress;
-    }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
+            }
+            $result | ConvertTo-Json -Depth 3 -Compress;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
         </File>
 		<File path="C:\Windows\Setup\Scripts\RemoveCapabilities.ps1">
-$selectors = @(
-    'Print.Fax.Scan';
-    'Language.Handwriting';
-    'Browser.InternetExplorer';
-    'MathRecognizer';
-    'OneCoreUAP.OneSync';
-    'OpenSSH.Client';
-    'App.Support.QuickAssist';
-    'Language.Speech';
-    'Language.TextToSpeech';
-    'App.StepsRecorder';
-    'Hello.Face.18967';
-    'Hello.Face.Migration.18967';
-    'Hello.Face.20134';
-    'Media.WindowsMediaPlayer';
-);
-$getCommand = {
-  Get-WindowsCapability -Online | Where-Object -Property 'State' -NotIn -Value @(
-    'NotPresent';
-    'Removed';
-  );
-};
-$filterCommand = {
-  ($_.Name -split '~')[0] -eq $selector;
-};
-$removeCommand = {
-  [CmdletBinding()]
-  param(
-    [Parameter( Mandatory, ValueFromPipeline )]
-    $InputObject
-  );
-  process {
-    $InputObject | Remove-WindowsCapability -Online -ErrorAction 'Continue';
-  }
-};
-$type = 'Capability';
-$logfile = 'C:\Windows\Setup\Scripts\RemoveCapabilities.log';
-&amp; {
-    $installed = &amp; $getCommand;
-    foreach( $selector in $selectors ) {
-        $result = [ordered] @{
+            $selectors = @(
+            'Print.Fax.Scan';
+            'Language.Handwriting';
+            'Browser.InternetExplorer';
+            'MathRecognizer';
+            'OneCoreUAP.OneSync';
+            'OpenSSH.Client';
+            'App.Support.QuickAssist';
+            'Language.Speech';
+            'Language.TextToSpeech';
+            'App.StepsRecorder';
+            'Hello.Face.18967';
+            'Hello.Face.Migration.18967';
+            'Hello.Face.20134';
+            'Media.WindowsMediaPlayer';
+            );
+            $getCommand = {
+            Get-WindowsCapability -Online | Where-Object -Property 'State' -NotIn -Value @(
+            'NotPresent';
+            'Removed';
+            );
+            };
+            $filterCommand = {
+            ($_.Name -split '~')[0] -eq $selector;
+            };
+            $removeCommand = {
+            [CmdletBinding()]
+            param(
+            [Parameter( Mandatory, ValueFromPipeline )]
+            $InputObject
+            );
+            process {
+            $InputObject | Remove-WindowsCapability -Online -ErrorAction 'Continue';
+            }
+            };
+            $type = 'Capability';
+            $logfile = 'C:\Windows\Setup\Scripts\RemoveCapabilities.log';
+            &amp; {
+            $installed = &amp; $getCommand;
+            foreach( $selector in $selectors ) {
+            $result = [ordered] @{
             Selector = $selector;
-        };
-        $found = $installed | Where-Object -FilterScript $filterCommand;
-        if( $found ) {
+            };
+            $found = $installed | Where-Object -FilterScript $filterCommand;
+            if( $found ) {
             $result.Output = $found | &amp; $removeCommand;
             if( $? ) {
-                $result.Message = "$type removed.";
+            $result.Message = "$type removed.";
             } else {
-                $result.Message = "$type not removed.";
-                $result.Error = $Error[0];
+            $result.Message = "$type not removed.";
+            $result.Error = $Error[0];
             }
-        } else {
+            } else {
             $result.Message = "$type not installed.";
-        }
-        $result | ConvertTo-Json -Depth 3 -Compress;
-    }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
+            }
+            $result | ConvertTo-Json -Depth 3 -Compress;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
         </File>
 		<File path="C:\Windows\Setup\Scripts\RemoveFeatures.ps1">
-$selectors = @(
-    'MediaPlayback';
-    'Microsoft-RemoteDesktopConnection';
-    'Recall';
-);
-$getCommand = {
-  Get-WindowsOptionalFeature -Online | Where-Object -Property 'State' -NotIn -Value @(
-    'Disabled';
-    'DisabledWithPayloadRemoved';
-  );
-};
-$filterCommand = {
-  $_.FeatureName -eq $selector;
-};
-$removeCommand = {
-  [CmdletBinding()]
-  param(
-    [Parameter( Mandatory, ValueFromPipeline )]
-    $InputObject
-  );
-  process {
-    $InputObject | Disable-WindowsOptionalFeature -Online -Remove -NoRestart -ErrorAction 'Continue';
-  }
-};
-$type = 'Feature';
-$logfile = 'C:\Windows\Setup\Scripts\RemoveFeatures.log';
-&amp; {
-    $installed = &amp; $getCommand;
-    foreach( $selector in $selectors ) {
-        $result = [ordered] @{
+            $selectors = @(
+            'MediaPlayback';
+            'Microsoft-RemoteDesktopConnection';
+            'Recall';
+            );
+            $getCommand = {
+            Get-WindowsOptionalFeature -Online | Where-Object -Property 'State' -NotIn -Value @(
+            'Disabled';
+            'DisabledWithPayloadRemoved';
+            );
+            };
+            $filterCommand = {
+            $_.FeatureName -eq $selector;
+            };
+            $removeCommand = {
+            [CmdletBinding()]
+            param(
+            [Parameter( Mandatory, ValueFromPipeline )]
+            $InputObject
+            );
+            process {
+            $InputObject | Disable-WindowsOptionalFeature -Online -Remove -NoRestart -ErrorAction
+            'Continue';
+            }
+            };
+            $type = 'Feature';
+            $logfile = 'C:\Windows\Setup\Scripts\RemoveFeatures.log';
+            &amp; {
+            $installed = &amp; $getCommand;
+            foreach( $selector in $selectors ) {
+            $result = [ordered] @{
             Selector = $selector;
-        };
-        $found = $installed | Where-Object -FilterScript $filterCommand;
-        if( $found ) {
+            };
+            $found = $installed | Where-Object -FilterScript $filterCommand;
+            if( $found ) {
             $result.Output = $found | &amp; $removeCommand;
             if( $? ) {
-                $result.Message = "$type removed.";
+            $result.Message = "$type removed.";
             } else {
-                $result.Message = "$type not removed.";
-                $result.Error = $Error[0];
+            $result.Message = "$type not removed.";
+            $result.Error = $Error[0];
             }
-        } else {
+            } else {
             $result.Message = "$type not installed.";
-        }
-        $result | ConvertTo-Json -Depth 3 -Compress;
-    }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
+            }
+            $result | ConvertTo-Json -Depth 3 -Compress;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; $logfile;
         </File>
 		<File path="C:\Windows\Setup\Scripts\SetStartPins.ps1">
-$json = '{"pinnedList":[]}';
-if( [System.Environment]::OSVersion.Version.Build -lt 20000 ) {
-    return;
-}
-$key = 'Registry::HKLM\SOFTWARE\Microsoft\PolicyManager\current\device\Start';
-New-Item -Path $key -ItemType 'Directory' -ErrorAction 'SilentlyContinue';
-Set-ItemProperty -LiteralPath $key -Name 'ConfigureStartPins' -Value $json -Type 'String';
+            $json = '{"pinnedList":[]}';
+            if( [System.Environment]::OSVersion.Version.Build -lt 20000 ) {
+            return;
+            }
+            $key = 'Registry::HKLM\SOFTWARE\Microsoft\PolicyManager\current\device\Start';
+            New-Item -Path $key -ItemType 'Directory' -ErrorAction 'SilentlyContinue';
+            Set-ItemProperty -LiteralPath $key -Name 'ConfigureStartPins' -Value $json -Type
+            'String';
         </File>
 		<File path="C:\Windows\Setup\Scripts\SetColorTheme.ps1">
-$lightThemeSystem = 0;
-$lightThemeApps = 0;
-$accentColorOnStart = 0;
-$enableTransparency = 1;
-$htmlAccentColor = '#0078D4';
-&amp; {
-    $params = @{
-        LiteralPath = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize';
-        Force = $true;
-        Type = 'DWord';
-    };
-    Set-ItemProperty @params -Name 'SystemUsesLightTheme' -Value $lightThemeSystem;
-    Set-ItemProperty @params -Name 'AppsUseLightTheme' -Value $lightThemeApps;
-    Set-ItemProperty @params -Name 'ColorPrevalence' -Value $accentColorOnStart;
-    Set-ItemProperty @params -Name 'EnableTransparency' -Value $enableTransparency;
-};
-&amp; {
-    Add-Type -AssemblyName 'System.Drawing';
-    $accentColor = [System.Drawing.ColorTranslator]::FromHtml( $htmlAccentColor );
+            $lightThemeSystem = 0;
+            $lightThemeApps = 0;
+            $accentColorOnStart = 0;
+            $enableTransparency = 1;
+            $htmlAccentColor = '#0078D4';
+            &amp; {
+            $params = @{
+            LiteralPath =
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize';
+            Force = $true;
+            Type = 'DWord';
+            };
+            Set-ItemProperty @params -Name 'SystemUsesLightTheme' -Value $lightThemeSystem;
+            Set-ItemProperty @params -Name 'AppsUseLightTheme' -Value $lightThemeApps;
+            Set-ItemProperty @params -Name 'ColorPrevalence' -Value $accentColorOnStart;
+            Set-ItemProperty @params -Name 'EnableTransparency' -Value $enableTransparency;
+            };
+            &amp; {
+            Add-Type -AssemblyName 'System.Drawing';
+            $accentColor = [System.Drawing.ColorTranslator]::FromHtml( $htmlAccentColor );
 
-    function ConvertTo-DWord {
-        param(
+            function ConvertTo-DWord {
+            param(
             [System.Drawing.Color]
             $Color
-        );
-                        
-        [byte[]] $bytes = @(
+            );
+
+            [byte[]] $bytes = @(
             $Color.R;
             $Color.G;
             $Color.B;
             $Color.A;
-        );
-        return [System.BitConverter]::ToUInt32( $bytes, 0); 
-    }
+            );
+            return [System.BitConverter]::ToUInt32( $bytes, 0);
+            }
 
-    $startColor = [System.Drawing.Color]::FromArgb( 0xD2, $accentColor );
-    Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name 'StartColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
-    Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name 'AccentColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
-    Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\DWM' -Name 'AccentColor' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
-    $params = @{
-        LiteralPath = 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent';
-        Name = 'AccentPalette';
-    };
-    $palette = Get-ItemPropertyValue @params;
-    $index = 20;
-    $palette[ $index++ ] = $accentColor.R;
-    $palette[ $index++ ] = $accentColor.G;
-    $palette[ $index++ ] = $accentColor.B;
-    $palette[ $index++ ] = $accentColor.A;
-    Set-ItemProperty @params -Value $palette -Type 'Binary' -Force;
-};
+            $startColor = [System.Drawing.Color]::FromArgb( 0xD2, $accentColor );
+            Set-ItemProperty -LiteralPath
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name
+            'StartColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+            Set-ItemProperty -LiteralPath
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent' -Name
+            'AccentColorMenu' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+            Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\DWM' -Name
+            'AccentColor' -Value( ConvertTo-DWord -Color $accentColor ) -Type 'DWord' -Force;
+            $params = @{
+            LiteralPath =
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent';
+            Name = 'AccentPalette';
+            };
+            $palette = Get-ItemPropertyValue @params;
+            $index = 20;
+            $palette[ $index++ ] = $accentColor.R;
+            $palette[ $index++ ] = $accentColor.G;
+            $palette[ $index++ ] = $accentColor.B;
+            $palette[ $index++ ] = $accentColor.A;
+            Set-ItemProperty @params -Value $palette -Type 'Binary' -Force;
+            };
         </File>
 		<File path="C:\Windows\Setup\Scripts\GetWallpaper.ps1">
-$url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/img19.png';
-&amp; {
-    $ProgressPreference = 'SilentlyContinue';
-    ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
-};
+            $url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/img19.png';
+            &amp; {
+            $ProgressPreference = 'SilentlyContinue';
+            ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
+            };
         </File>
 		<File path="C:\Windows\Setup\Scripts\SetWallpaper.ps1">
-Add-Type -TypeDefinition '
-    using System.Drawing;
-    using System.Runtime.InteropServices;
-    
-    public static class WallpaperSetter {
-        [DllImport("user32.dll")]
-        private static extern bool SetSysColors(
-            int cElements, 
+            Add-Type -TypeDefinition '
+            using System.Drawing;
+            using System.Runtime.InteropServices;
+
+            public static class WallpaperSetter {
+            [DllImport("user32.dll")]
+            private static extern bool SetSysColors(
+            int cElements,
             int[] lpaElements,
             int[] lpaRgbValues
-        );
+            );
 
-        [DllImport("user32.dll")]
-        private static extern bool SystemParametersInfo(
+            [DllImport("user32.dll")]
+            private static extern bool SystemParametersInfo(
             uint uiAction,
             uint uiParam,
             string pvParam,
             uint fWinIni
-        );
+            );
 
-        public static void SetDesktopBackground(Color color) {
+            public static void SetDesktopBackground(Color color) {
             SystemParametersInfo(20, 0, "", 0);
             SetSysColors(1, new int[] { 1 }, new int[] { ColorTranslator.ToWin32(color) });
-        }
+            }
 
-        public static void SetDesktopImage(string file) {
+            public static void SetDesktopImage(string file) {
             SystemParametersInfo(20, 0, file, 0);
-        }
-    }
-' -ReferencedAssemblies 'System.Drawing';
+            }
+            }
+            ' -ReferencedAssemblies 'System.Drawing';
 
-function Set-WallpaperColor {
-    param(
-        [string]
-        $HtmlColor
-    );
+            function Set-WallpaperColor {
+            param(
+            [string]
+            $HtmlColor
+            );
 
-    $color = [System.Drawing.ColorTranslator]::FromHtml( $HtmlColor );
-    [WallpaperSetter]::SetDesktopBackground( $color );
-    Set-ItemProperty -Path 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name 'BackgroundType' -Type 'DWord' -Value 1 -Force;
-    Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type 'String' -Value '' -Force;
-    Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Colors' -Name 'Background' -Type 'String' -Value "$($color.R) $($color.G) $($color.B)" -Force;
-}
-function Set-WallpaperImage {
-    param(
-        [string]
-        $LiteralPath
-    );
+            $color = [System.Drawing.ColorTranslator]::FromHtml( $HtmlColor );
+            [WallpaperSetter]::SetDesktopBackground( $color );
+            Set-ItemProperty -Path
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name
+            'BackgroundType' -Type 'DWord' -Value 1 -Force;
+            Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type
+            'String' -Value '' -Force;
+            Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Colors' -Name 'Background' -Type
+            'String' -Value "$($color.R) $($color.G) $($color.B)" -Force;
+            }
+            function Set-WallpaperImage {
+            param(
+            [string]
+            $LiteralPath
+            );
 
-    if( $LiteralPath | Test-Path ) {
-        [WallpaperSetter]::SetDesktopImage( $LiteralPath );
-        Set-ItemProperty -Path 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name 'BackgroundType' -Type 'DWord' -Value 0 -Force;
-        Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type 'String' -Value $LiteralPath -Force;
-    } else {
-        "Cannot use '$LiteralPath' as a desktop wallpaper because that file does not exist.";
-    }
-}
-Set-WallpaperImage -LiteralPath 'C:\Windows\Setup\Scripts\Wallpaper';
+            if( $LiteralPath | Test-Path ) {
+            [WallpaperSetter]::SetDesktopImage( $LiteralPath );
+            Set-ItemProperty -Path
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers' -Name
+            'BackgroundType' -Type 'DWord' -Value 0 -Force;
+            Set-ItemProperty -Path 'Registry::HKCU\Control Panel\Desktop' -Name 'WallPaper' -Type
+            'String' -Value $LiteralPath -Force;
+            } else {
+            "Cannot use '$LiteralPath' as a desktop wallpaper because that file does not exist.";
+            }
+            }
+            Set-WallpaperImage -LiteralPath 'C:\Windows\Setup\Scripts\Wallpaper';
         </File>
 		<File path="C:\Windows\Setup\Scripts\GetLockScreenImage.ps1">
-$url = 'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/11-lockscreen.jpg';
-&amp; {
-    $ProgressPreference = 'SilentlyContinue';
-    ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
-};
+            $url =
+            'https://raw.githubusercontent.com/VitalSkib/files/refs/heads/main/11-lockscreen.jpg';
+            &amp; {
+            $ProgressPreference = 'SilentlyContinue';
+            ( Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 ).Content;
+            };
         </File>
 		<File path="C:\Windows\Setup\Scripts\unattend-01.ps1">
-$user = 'microsoft';
-$repository = 'terminal';
+            $user = 'microsoft';
+            $repository = 'terminal';
 
-$latest = $(
-    &amp; {
-        $ProgressPreference = 'SilentlyContinue';
-        Invoke-WebRequest -Uri "https://api.github.com/repos/${user}/${repository}/releases" -UseBasicParsing -Headers @{
+            $latest = $(
+            &amp; {
+            $ProgressPreference = 'SilentlyContinue';
+            Invoke-WebRequest -Uri "https://api.github.com/repos/${user}/${repository}/releases"
+            -UseBasicParsing -Headers @{
             Accept = 'application/vnd.github.v3+json';
-        } | Select-Object -ExpandProperty 'Content' | ConvertFrom-Json;
-    };
-) | Where-Object -FilterScript {
-    -not $_.draft -and -not $_.prerelease;
-} | Select-Object -First 1;
+            } | Select-Object -ExpandProperty 'Content' | ConvertFrom-Json;
+            };
+            ) | Where-Object -FilterScript {
+            -not $_.draft -and -not $_.prerelease;
+            } | Select-Object -First 1;
 
-$latest.assets.browser_download_url | Where-Object -FilterScript {
-    $_ -match '\.msixbundle$';
-} | Select-Object -First 1 | ForEach-Object -Process {
-    $uri = [uri]::new( $_ );
-    $file = "$env:TEMP\{0}" -f $uri.Segments[-1];
-    [System.Net.WebClient]::new().DownloadFile( $uri, $file );
-    Add-AppxProvisionedPackage -Online -PackagePath $file -SkipLicense;
-    Remove-Item -LiteralPath $file -ErrorAction 'SilentlyContinue';
-};
+            $latest.assets.browser_download_url | Where-Object -FilterScript {
+            $_ -match '\.msixbundle$';
+            } | Select-Object -First 1 | ForEach-Object -Process {
+            $uri = [uri]::new( $_ );
+            $file = "$env:TEMP\{0}" -f $uri.Segments[-1];
+            [System.Net.WebClient]::new().DownloadFile( $uri, $file );
+            Add-AppxProvisionedPackage -Online -PackagePath $file -SkipLicense;
+            Remove-Item -LiteralPath $file -ErrorAction 'SilentlyContinue';
+            };
         </File>
 		<File path="C:\Windows\Setup\Scripts\Specialize.ps1">
-$scripts = @(
-    {
-        reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f;
-    };
-    {
-        Remove-Item -LiteralPath 'C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk', 'C:\Windows\System32\OneDriveSetup.exe', 'C:\Windows\SysWOW64\OneDriveSetup.exe' -ErrorAction 'Continue';
-    };
-    {
-        Remove-Item -LiteralPath 'Registry::HKLM\Software\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate' -Force -ErrorAction 'SilentlyContinue';
-    };
-    {
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f;
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\RemovePackages.ps1';
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\RemoveCapabilities.ps1';
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\RemoveFeatures.ps1';
-    };
-    {
-        net.exe accounts /maxpwage:UNLIMITED;
-    };
-    {
-        reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v SmartScreenEnabled /t REG_SZ /d "Off" /f;
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v ServiceEnabled /t REG_DWORD /d 0 /f;
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyMalicious /t REG_DWORD /d 0 /f;
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyPasswordReuse /t REG_DWORD /d 0 /f;
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyUnsafeApp /t REG_DWORD /d 0 /f;
-        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v HideSystray /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
-    };
-    {
-        reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
-    };
-    {
-        Remove-Item -LiteralPath 'C:\Users\Public\Desktop\Microsoft Edge.lnk' -ErrorAction 'SilentlyContinue' -Verbose;
-    };
-    {
-        auditpol.exe /set /subcategory:"{0CCE922B-69AE-11D9-BED3-505054503030}" /success:enable /failure:enable;
-    };
-    {
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f;
-    };
-    {
-        Set-ExecutionPolicy -Scope 'LocalMachine' -ExecutionPolicy 'RemoteSigned' -Force;
-    };
-    {
-        reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKLM\Software\Policies\Microsoft\Edge" /v HideFirstRunExperience /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f;
-        reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v StartupBoostEnabled /t REG_DWORD /d 0 /f;
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\SetStartPins.ps1';
-    };
-    {
-        try {
-          $bytes = &amp; 'C:\Windows\Setup\Scripts\GetWallpaper.ps1';
-          [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\Wallpaper', $bytes );
-        } catch {
-          $_;
-        }
-    };
-    {
-        try {
-          $bytes = &amp; 'C:\Windows\Setup\Scripts\GetLockScreenImage.ps1';
-          [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\LockScreenImage', $bytes );
-          reg.exe add "HKLM\Software\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v LockScreenImagePath /t REG_SZ /d "C:\Windows\Setup\Scripts\LockScreenImage" /f;
-        } catch {
-          $_;
-        }
-    };
-);
+            $scripts = @(
+            {
+            reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t
+            REG_DWORD /d 1 /f;
+            };
+            {
+            Remove-Item -LiteralPath 'C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start
+            Menu\Programs\OneDrive.lnk', 'C:\Windows\System32\OneDriveSetup.exe',
+            'C:\Windows\SysWOW64\OneDriveSetup.exe' -ErrorAction 'Continue';
+            };
+            {
+            Remove-Item -LiteralPath
+            'Registry::HKLM\Software\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate'
+            -Force -ErrorAction 'SilentlyContinue';
+            };
+            {
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v
+            ConfigureChatAutoInstall /t REG_DWORD /d 0 /f;
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\RemovePackages.ps1';
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\RemoveCapabilities.ps1';
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\RemoveFeatures.ps1';
+            };
+            {
+            net.exe accounts /maxpwage:UNLIMITED;
+            };
+            {
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v
+            VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f;
+            };
+            {
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v
+            SmartScreenEnabled /t REG_SZ /d "Off" /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
+            ServiceEnabled /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
+            NotifyMalicious /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
+            NotifyPasswordReuse /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
+            NotifyUnsafeApp /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray"
+            /v HideSystray /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v
+            EnableLUA /t REG_DWORD /d 0 /f
+            };
+            {
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t
+            REG_DWORD /d 1 /f
+            };
+            {
+            Remove-Item -LiteralPath 'C:\Users\Public\Desktop\Microsoft Edge.lnk' -ErrorAction
+            'SilentlyContinue' -Verbose;
+            };
+            {
+            auditpol.exe /set /subcategory:"{0CCE922B-69AE-11D9-BED3-505054503030}" /success:enable
+            /failure:enable;
+            };
+            {
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v
+            ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f;
+            };
+            {
+            Set-ExecutionPolicy -Scope 'LocalMachine' -ExecutionPolicy 'RemoteSigned' -Force;
+            };
+            {
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v
+            HiberbootEnabled /t REG_DWORD /d 0 /f;
+            };
+            {
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD
+            /d 0 /f;
+            };
+            {
+            reg.exe add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v
+            "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v
+            "PreventDeviceEncryption" /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKLM\Software\Policies\Microsoft\Edge" /v HideFirstRunExperience /t
+            REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v BackgroundModeEnabled
+            /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v StartupBoostEnabled
+            /t REG_DWORD /d 0 /f;
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\SetStartPins.ps1';
+            };
+            {
+            try {
+            $bytes = &amp; 'C:\Windows\Setup\Scripts\GetWallpaper.ps1';
+            [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\Wallpaper', $bytes );
+            } catch {
+            $_;
+            }
+            };
+            {
+            try {
+            $bytes = &amp; 'C:\Windows\Setup\Scripts\GetLockScreenImage.ps1';
+            [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\LockScreenImage', $bytes );
+            reg.exe add "HKLM\Software\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v
+            LockScreenImagePath /t REG_SZ /d "C:\Windows\Setup\Scripts\LockScreenImage" /f;
+            } catch {
+            $_;
+            }
+            };
+            );
 
-&amp; {
-  [float] $complete = 0;
-  [float] $increment = 100 / $scripts.Count;
-  foreach( $script in $scripts ) {
-    Write-Progress -Activity 'Running scripts to customize your Windows installation. Do not close this window.' -PercentComplete $complete;
-    '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
-      $str = $script.ToString().Trim() -replace '\s+', ' ';
-      $max = 100;
-      if( $str.Length -le $max ) {
-        $str;
-      } else {
-        $str.Substring( 0, $max - 1 ) + '&#x2026;';
-      }
-    );
-    $start = [datetime]::Now;
-    &amp; $script;
-    '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
-    "`r`n" * 3;
-    $complete += $increment;
-  }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\Specialize.log";
+            &amp; {
+            [float] $complete = 0;
+            [float] $increment = 100 / $scripts.Count;
+            foreach( $script in $scripts ) {
+            Write-Progress -Activity 'Running scripts to customize your Windows installation. Do not
+            close this window.' -PercentComplete $complete;
+            '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+            $str = $script.ToString().Trim() -replace '\s+', ' ';
+            $max = 100;
+            if( $str.Length -le $max ) {
+            $str;
+            } else {
+            $str.Substring( 0, $max - 1 ) + '&#x2026;';
+            }
+            );
+            $start = [datetime]::Now;
+            &amp; $script;
+            '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start
+            ).TotalMilliseconds;
+            "`r`n" * 3;
+            $complete += $increment;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt;
+            "C:\Windows\Setup\Scripts\Specialize.log";
         </File>
 		<File path="C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1">
-"Starting Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
-trap {
-    "ERROR in Specialize_Tweaks.ps1 : $($_.Exception.Message)" | Out-File -FilePath "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
-    continue
-}
-        # --- Explorer Navigation Pane Cleanup (Network, Gallery, Home) ---
-		$logFile = "C:\Windows\Setup\Scripts\Specialize_Tweaks.log"
-		function Log($m) {
-			$t = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-			Add-Content -Path $logFile -Value "$t`t$m"
-		}
+            "Starting Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
+            trap {
+            "ERROR in Specialize_Tweaks.ps1 : $($_.Exception.Message)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
+            continue
+            }
+            # --- Explorer Navigation Pane Cleanup (Network, Gallery, Home) ---
+            $logFile = "C:\Windows\Setup\Scripts\Specialize_Tweaks.log"
+            function Log($m) {
+            $t = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            Add-Content -Path $logFile -Value "$t`t$m"
+            }
 
-		try {
-			# Hide/Remove Network
-			$networkCLSID = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
-			reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-			reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-			reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null
-			Log "Network CLSID processed: $networkCLSID"
+            try {
+            # Hide/Remove Network
+            $networkCLSID = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
+            reg.exe delete
+            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID"
+            /f | Out-Null
+            reg.exe delete
+            "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID"
+            /f | Out-Null
+            reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null
+            Log "Network CLSID processed: $networkCLSID"
 
-			# Remove Gallery
-			$galleryCLSID = "{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}"
-			reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
-			Log "Gallery CLSID removed: $galleryCLSID"
+            # Remove Gallery
+            $galleryCLSID = "{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}"
+            reg.exe delete
+            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID"
+            /f | Out-Null
+            Log "Gallery CLSID removed: $galleryCLSID"
 
-			# Hide Home via HiddenByDefault and remove WOW6432Node duplicate
-			$homeCLSID = "{f874310e-b6b7-47dc-bc84-b9e6b38f5903}"
-			reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
-			reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
-			Log "Home hidden via HiddenByDefault and WOW6432Node duplicate removed: $homeCLSID"
-		}
-		catch {
-			Log "Error in navigation pane cleanup: $_"
-		}
+            # Hide Home via HiddenByDefault and remove WOW6432Node duplicate
+            $homeCLSID = "{f874310e-b6b7-47dc-bc84-b9e6b38f5903}"
+            reg.exe add
+            "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID"
+            /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
+            reg.exe delete
+            "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID"
+            /f | Out-Null
+            Log "Home hidden via HiddenByDefault and WOW6432Node duplicate removed: $homeCLSID"
+            }
+            catch {
+            Log "Error in navigation pane cleanup: $_"
+            }
 
-		# Restart Explorer to apply changes
-		try {
-			Stop-Process -Name explorer -Force
-			Start-Process explorer.exe
-			Log "Explorer restarted"
-		}
-		catch {
-			Log "Error restarting Explorer: $_"
-		}
+            # Restart Explorer to apply changes
+            try {
+            Stop-Process -Name explorer -Force
+            Start-Process explorer.exe
+            Log "Explorer restarted"
+            }
+            catch {
+            Log "Error restarting Explorer: $_"
+            }
 
-        # 2. System-wide Explorer Defaults (This PC by default)
-        reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
-        reg.exe unload "HKU\DefaultUser"
+            # 2. System-wide Explorer Defaults (This PC by default)
+            reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            LaunchTo /t REG_DWORD /d 1 /f
+            reg.exe unload "HKU\DefaultUser"
 
-        # 3. Taskbar and Start Menu Tweaks
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 1 /f
+            # 3. Taskbar and Start Menu Tweaks
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            Start_TrackProgs /t REG_DWORD /d 1 /f
 
-        # 4. Desktop Icons (Remove Shortcut Arrows)
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d "shell32.dll,-50" /f
+            # 4. Desktop Icons (Remove Shortcut Arrows)
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29
+            /t REG_SZ /d "shell32.dll,-50" /f
 
-        # 5. System Personalization (No Lock Screen and No Blur)
-        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f
-        reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v DisableAcrylicBackgroundOnLogon /t REG_DWORD /d 1 /f
+            # 5. System Personalization (No Lock Screen and No Blur)
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen
+            /t REG_DWORD /d 1 /f
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v
+            DisableAcrylicBackgroundOnLogon /t REG_DWORD /d 1 /f
 
-        # 6. Power Management and Storage Optimization
-        powercfg.exe /hibernate off
-        reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
+            # 6. Power Management and Storage Optimization
+            powercfg.exe /hibernate off
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v
+            ShippedWithReserves /t REG_DWORD /d 0 /f
 
-"Finished Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
+            "Finished Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\Specialize_Tweaks.log" -Append
         </File>
 		<File path="C:\Windows\Setup\Scripts\UserOnce.ps1">
-	"Starting UserOnce.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\UserOnce.log" -Append
-	trap {
-    "ERROR in UserOnce.ps1 : $($_.Exception.Message)" | Out-File -FilePath "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
-    continue
-	}
-$scripts = @(
-    {
-        Get-AppxPackage -Name 'Microsoft.Windows.Ai.Copilot.Provider' | Remove-AppxPackage;
-    };
-    {
-        @(
-          Get-ChildItem -LiteralPath $env:USERPROFILE -Force -Recurse -Depth 2;
-        ) | Where-Object -FilterScript {
+            "Starting UserOnce.ps1 at $(Get-Date)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\UserOnce.log" -Append
+            trap {
+            "ERROR in UserOnce.ps1 : $($_.Exception.Message)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\CriticalErrors.log" -Append
+            continue
+            }
+            $scripts = @(
+            {
+            Get-AppxPackage -Name 'Microsoft.Windows.Ai.Copilot.Provider' | Remove-AppxPackage;
+            };
+            {
+            @(
+            Get-ChildItem -LiteralPath $env:USERPROFILE -Force -Recurse -Depth 2;
+            ) | Where-Object -FilterScript {
             $_.Attributes.HasFlag( [System.IO.FileAttributes]::ReparsePoint );
-        } | Remove-Item -Force -Recurse -Verbose;
-    };
-    {
-        Remove-Item -LiteralPath "${env:USERPROFILE}\Desktop\Microsoft Edge.lnk" -ErrorAction 'SilentlyContinue' -Verbose;
-    };
-    {
-        Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'LaunchTo' -Type 'DWord' -Value 1;
-    };
-    {
-        Set-ItemProperty -LiteralPath 'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 1;
-    };
-    {
-        New-Item -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Force;
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
-        New-Item -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Force;
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
-    };
-    {
-        Set-ItemProperty -Path 'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start' -Name 'VisiblePlaces' -Value $( [convert]::FromBase64String('ztU0LVr6Q0WC8iLm6vd3PC+zZ+PeiVVDv85h83sYqTe8JIoUDNaJQqCAbtm7okiCIAYLsFF/MkyqHjTMVH9zFUSBdf4NCK5Ci9o07Ze2Y5RKsL10SvloT4vWQ5gHHai8oAc/OArogEywWobbhF28TYYIc1KqUUNCn3sndlhGWdTFpbNChn30QoCkk/rKeoi1') ) -Type 'Binary';
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\SetColorTheme.ps1';
-    };
-    {
-        &amp; 'C:\Windows\Setup\Scripts\SetWallpaper.ps1';
-    };
-    {
-        Get-Process -Name 'explorer' -ErrorAction 'SilentlyContinue' | Where-Object -FilterScript {
-            $_.SessionId -eq ( Get-Process -Id $PID ).SessionId;
-        } | Stop-Process -Force;
-    };
-);
-&amp; {
-  [float] $complete = 0;
-  [float] $increment = 100 / $scripts.Count;
-  foreach( $script in $scripts ) {
-    Write-Progress -Activity 'Running scripts to configure this user account. Do not close this window.' -PercentComplete $complete;
-    '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
-      $str = $script.ToString().Trim() -replace '\s+', ' ';
-      $max = 100;
-      if( $str.Length -le $max ) {
-        $str;
-      } else {
-        $str.Substring( 0, $max - 1 ) + '&#x2026;';
-      }
-    );
-    $start = [datetime]::Now;
-    &amp; $script;
-    '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
-    "`r`n" * 3;
-    $complete += $increment;
-  }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "$env:TEMP\UserOnce.log";
+            } | Remove-Item -Force -Recurse -Verbose;
+            };
+            {
+            Remove-Item -LiteralPath "${env:USERPROFILE}\Desktop\Microsoft Edge.lnk" -ErrorAction
+            'SilentlyContinue' -Verbose;
+            };
+            {
+            Set-ItemProperty -LiteralPath
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name
+            'LaunchTo' -Type 'DWord' -Value 1;
+            };
+            {
+            Set-ItemProperty -LiteralPath
+            'Registry::HKCU\Software\Microsoft\Windows\CurrentVersion\Search' -Name
+            'SearchboxTaskbarMode' -Type 'DWord' -Value 1;
+            };
+            {
+            New-Item -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Force;
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu'
+            -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
+            New-Item -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Force;
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{5399e694-6ce5-4d6c-8fce-1d8870fdcba0}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{b4bfcc3a-db2c-424c-b029-7fe99a87c641}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{a8cdff1c-4878-43be-b5fd-f8091c1c60d0}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{374de290-123f-4565-9164-39c4925e467b}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{f874310e-b6b7-47dc-bc84-b9e6b38f5903}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{1cf1260c-4dd0-4ebb-811f-33c572699fde}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{f02c1a0d-be21-4350-88b0-7367fc96ef3c}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{3add1653-eb32-4cb0-bbd7-dfa0abb5acca}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{645ff040-5081-101b-9f08-00aa002f954e}' -Value 0 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{20d04fe0-3aea-1069-a2d8-08002b30309d}' -Value 0 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{59031a47-3f72-44a7-89c5-5595fe6b30ee}' -Value 1 -Type 'DWord';
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel'
+            -Name '{a0953c92-50dc-43bf-be83-3742fed03c9c}' -Value 1 -Type 'DWord';
+            };
+            {
+            Set-ItemProperty -Path
+            'Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start' -Name
+            'VisiblePlaces' -Value $(
+            [convert]::FromBase64String('ztU0LVr6Q0WC8iLm6vd3PC+zZ+PeiVVDv85h83sYqTe8JIoUDNaJQqCAbtm7okiCIAYLsFF/MkyqHjTMVH9zFUSBdf4NCK5Ci9o07Ze2Y5RKsL10SvloT4vWQ5gHHai8oAc/OArogEywWobbhF28TYYIc1KqUUNCn3sndlhGWdTFpbNChn30QoCkk/rKeoi1')
+            ) -Type 'Binary';
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\SetColorTheme.ps1';
+            };
+            {
+            &amp; 'C:\Windows\Setup\Scripts\SetWallpaper.ps1';
+            };
+            {
+            # Enable seconds in system tray clock
+            New-ItemProperty -Path
+            'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' `
+            -Name 'ShowSecondsInSystemClock' -PropertyType DWord -Value 1 -Force
 
-"Finished UserOnce.ps1 at $(Get-Date)" | Out-File -FilePath "C:\Windows\Setup\Scripts\UserOnce.log" -Append
+            # Enable time in Notification Center
+            New-ItemProperty -Path
+            'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' `
+            -Name 'ShowClockInNotificationCenter' -PropertyType DWord -Value 1 -Force
+            };
+            {
+            Get-Process -Name 'explorer' -ErrorAction 'SilentlyContinue' | Where-Object
+            -FilterScript {
+            $_.SessionId -eq ( Get-Process -Id $PID ).SessionId;
+            } | Stop-Process -Force;
+            };
+            );
+            &amp; {
+            [float] $complete = 0;
+            [float] $increment = 100 / $scripts.Count;
+            foreach( $script in $scripts ) {
+            Write-Progress -Activity 'Running scripts to configure this user account. Do not close
+            this window.' -PercentComplete $complete;
+            '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+            $str = $script.ToString().Trim() -replace '\s+', ' ';
+            $max = 100;
+            if( $str.Length -le $max ) {
+            $str;
+            } else {
+            $str.Substring( 0, $max - 1 ) + '&#x2026;';
+            }
+            );
+            $start = [datetime]::Now;
+            &amp; $script;
+            '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start
+            ).TotalMilliseconds;
+            "`r`n" * 3;
+            $complete += $increment;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "$env:TEMP\UserOnce.log";
+            "Finished UserOnce.ps1 at $(Get-Date)" | Out-File -FilePath
+            "C:\Windows\Setup\Scripts\UserOnce.log" -Append
         </File>
 		<File path="C:\Windows\Setup\Scripts\DefaultUser.ps1">
-$scripts = @(
-    {
-        reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
-    };
-    {
-        Remove-ItemProperty -LiteralPath 'Registry::HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'OneDriveSetup' -Force -ErrorAction 'Continue';
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f;
-    };
-    {
-        # Explorer Advanced: HideFileExt, Hidden, LastActiveClick, CompactMode
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "HideFileExt" /t REG_DWORD /d 0 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "Hidden" /t REG_DWORD /d 1 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "LastActiveClick" /t REG_DWORD /d 1 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "UseCompactMode" /t REG_DWORD /d 1 /f;
-    };
-    {
-        # Preview Pane
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v "ShowPreviewPane" /t REG_DWORD /d 1 /f;
-    };
-    {
-        # Hide Network from Sidebar
-        $id = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
-        reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f;
-        reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id\ShellFolder" /v "Attributes" /t REG_DWORD /d 2954756196 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenEnabled" /ve /t REG_DWORD /d 0 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenPuaEnabled" /ve /t REG_DWORD /d 0 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f;
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v PreventOverride /t REG_DWORD /d 0 /f;
-    };
-    {
-        $names = @(
-          'ContentDeliveryAllowed';
-          'FeatureManagementEnabled';
-          'OEMPreInstalledAppsEnabled';
-          'PreInstalledAppsEnabled';
-          'PreInstalledAppsEverEnabled';
-          'SilentInstalledAppsEnabled';
-          'SoftLandingEnabled';
-          'SubscribedContentEnabled';
-          'SubscribedContent-310093Enabled';
-          'SubscribedContent-338387Enabled';
-          'SubscribedContent-338388Enabled';
-          'SubscribedContent-338389Enabled';
-          'SubscribedContent-338393Enabled';
-          'SubscribedContent-353694Enabled';
-          'SubscribedContent-353696Enabled';
-          'SubscribedContent-353698Enabled';
-          'SystemPaneSuggestionsEnabled';
-        );
-        foreach( $name in $names ) {
-          reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v $name /t REG_DWORD /d 0 /f;
-        }
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" /v TaskbarEndTask /t REG_DWORD /d 1 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t REG_DWORD /d 0 /f;
-    };
-    {
-        reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "UnattendedSetup" /t REG_SZ /d "powershell.exe -WindowStyle \""Hidden\"" -ExecutionPolicy \""Unrestricted\"" -NoProfile -File \""C:\Windows\Setup\Scripts\UserOnce.ps1\""" /f;
-    };
-);
-&amp; {
-  [float] $complete = 0;
-  [float] $increment = 100 / $scripts.Count;
-  foreach( $script in $scripts ) {
-    Write-Progress -Activity 'Modifying default user registry hive. Do not close.' -PercentComplete $complete;
-    '*** Executing: {0}' -f $(
-      $str = $script.ToString().Trim() -replace '\s+', ' ';
-      if( $str.Length -le 100 ) { $str; } else { $str.Substring(0, 97) + '...'; }
-    );
-    $start = [datetime]::Now;
-    &amp; $script;
-    '*** Finished in {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
-    "`r`n" * 2;
-    $complete += $increment;
-  }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\DefaultUser.log";
-</File>
+            $scripts = @(
+            {
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v
+            TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet
+            Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
+            };
+            {
+            Remove-ItemProperty -LiteralPath
+            'Registry::HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run' -Name
+            'OneDriveSetup' -Force -ErrorAction 'Continue';
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v
+            AppCaptureEnabled /t REG_DWORD /d 0 /f;
+            };
+            {
+            # Explorer Advanced: HideFileExt, Hidden, LastActiveClick, CompactMode
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            "HideFileExt" /t REG_DWORD /d 0 /f;
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            "Hidden" /t REG_DWORD /d 1 /f;
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            "LastActiveClick" /t REG_DWORD /d 1 /f;
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            "UseCompactMode" /t REG_DWORD /d 1 /f;
+            };
+            {
+            # Preview Pane
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer"
+            /v "ShowPreviewPane" /t REG_DWORD /d 1 /f;
+            };
+            {
+            # Hide Network from Sidebar
+            $id = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
+            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id" /v
+            "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id\ShellFolder" /v "Attributes" /t
+            REG_DWORD /d 2954756196 /f;
+            };
+            {
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            ShowTaskViewButton /t REG_DWORD /d 0 /f;
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenEnabled" /ve /t
+            REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenPuaEnabled" /ve /t
+            REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v
+            EnableWebContentEvaluation /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v
+            PreventOverride /t REG_DWORD /d 0 /f;
+            };
+            {
+            $names = @(
+            'ContentDeliveryAllowed';
+            'FeatureManagementEnabled';
+            'OEMPreInstalledAppsEnabled';
+            'PreInstalledAppsEnabled';
+            'PreInstalledAppsEverEnabled';
+            'SilentInstalledAppsEnabled';
+            'SoftLandingEnabled';
+            'SubscribedContentEnabled';
+            'SubscribedContent-310093Enabled';
+            'SubscribedContent-338387Enabled';
+            'SubscribedContent-338388Enabled';
+            'SubscribedContent-338389Enabled';
+            'SubscribedContent-338393Enabled';
+            'SubscribedContent-353694Enabled';
+            'SubscribedContent-353696Enabled';
+            'SubscribedContent-353698Enabled';
+            'SystemPaneSuggestionsEnabled';
+            );
+            foreach( $name in $names ) {
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v
+            $name /t REG_DWORD /d 0 /f;
+            }
+            };
+            {
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            TaskbarAl /t REG_DWORD /d 0 /f;
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v
+            DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add
+            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings"
+            /v TaskbarEndTask /t REG_DWORD /d 1 /f;
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t
+            REG_DWORD /d 0 /f;
+            };
+            {
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v
+            "UnattendedSetup" /t REG_SZ /d "powershell.exe -WindowStyle \""Hidden\""
+            -ExecutionPolicy \""Unrestricted\"" -NoProfile -File
+            \""C:\Windows\Setup\Scripts\UserOnce.ps1\""" /f;
+            };
+            );
+            &amp; {
+            [float] $complete = 0;
+            [float] $increment = 100 / $scripts.Count;
+            foreach( $script in $scripts ) {
+            Write-Progress -Activity 'Modifying default user registry hive. Do not close.'
+            -PercentComplete $complete;
+            '*** Executing: {0}' -f $(
+            $str = $script.ToString().Trim() -replace '\s+', ' ';
+            if( $str.Length -le 100 ) { $str; } else { $str.Substring(0, 97) + '...'; }
+            );
+            $start = [datetime]::Now;
+            &amp; $script;
+            '*** Finished in {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
+            "`r`n" * 2;
+            $complete += $increment;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt;
+            "C:\Windows\Setup\Scripts\DefaultUser.log";
+        </File>
 		<File path="C:\Windows\Setup\Scripts\FirstLogon.ps1">
-$scripts = @(
-    {
-        # 1. Cleanup Reparse Points
-        @(
+            $scripts = @(
+            {
+            # 1. Cleanup Reparse Points
+            @(
             Get-ChildItem -LiteralPath 'C:\' -Force;
             Get-ChildItem -LiteralPath 'C:\Users' -Force;
             Get-ChildItem -LiteralPath 'C:\Users\Default' -Force -Recurse -Depth 2;
             Get-ChildItem -LiteralPath 'C:\Users\Public' -Force -Recurse -Depth 2;
             Get-ChildItem -LiteralPath 'C:\ProgramData' -Force;
-        ) | Where-Object -FilterScript {
+            ) | Where-Object -FilterScript {
             $_.Attributes.HasFlag( [System.IO.FileAttributes]::ReparsePoint );
-        } | Remove-Item -Force -Recurse -Verbose;
-    };
-    {
-        # 2. Force Set TimeZone Display Name to Astana (The "Plan B")
-        $tzPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
-        Set-ItemProperty -Path $tzPath -Name 'Display' -Value '(UTC+05:00) Astana' -Force;
-        Set-ItemProperty -Path $tzPath -Name 'TimeZoneKeyName' -Value 'Qyzylorda Standard Time' -Force;
-    };
-    {
-        # 3. Remove Windows.old
-        cmd.exe /c "rmdir C:\Windows.old /s /q";
-    };
-    {
-        # 4. ViVeTool Configuration with Logging
-        $vivelog = 'C:\Windows\Setup\Scripts\ViVeTool.log'
-        "*** Starting ViVeTool configuration - $(Get-Date)" | Out-File -FilePath $vivelog -Append
+            } | Remove-Item -Force -Recurse -Verbose;
+            };
+            {
+            # 2. Force Set TimeZone Display Name to Astana (The "Plan B")
+            $tzPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation';
+            Set-ItemProperty -Path $tzPath -Name 'Display' -Value '(UTC+05:00) Astana' -Force;
+            Set-ItemProperty -Path $tzPath -Name 'TimeZoneKeyName' -Value 'Qyzylorda Standard Time'
+            -Force;
+            };
+            {
+            # 3. Remove Windows.old
+            cmd.exe /c "rmdir C:\Windows.old /s /q";
+            };
+            {
+            # 4. ViVeTool Configuration with Logging
+            $vivelog = 'C:\Windows\Setup\Scripts\ViVeTool.log'
+            "*** Starting ViVeTool configuration - $(Get-Date)" | Out-File -FilePath $vivelog
+            -Append
 
-        try {
+            try {
             # --- Internet Connection Wait Block ---
             "Waiting for internet connection..." | Out-File -FilePath $vivelog -Append
             $retryCount = 0
@@ -925,79 +1128,91 @@ $scripts = @(
             $connected = $false
 
             while (-not $connected -and $retryCount -lt $maxRetries) {
-                # Pinging github.com to ensure we can reach the source
-                if (Test-Connection -ComputerName github.com -Count 1 -Quiet) {
-                    $connected = $true
-                    "Internet connection established." | Out-File -FilePath $vivelog -Append
-                } else {
-                    $retryCount++
-                    "Connection failed. Retry $retryCount of $maxRetries..." | Out-File -FilePath $vivelog -Append
-                    Start-Sleep -Seconds 3
-                }
+            # Pinging github.com to ensure we can reach the source
+            if (Test-Connection -ComputerName github.com -Count 1 -Quiet) {
+            $connected = $true
+            "Internet connection established." | Out-File -FilePath $vivelog -Append
+            } else {
+            $retryCount++
+            "Connection failed. Retry $retryCount of $maxRetries..." | Out-File -FilePath $vivelog
+            -Append
+            Start-Sleep -Seconds 3
+            }
             }
 
             if (-not $connected) {
-                throw "Internet connection not available after $($maxRetries * 3) seconds."
+            throw "Internet connection not available after $($maxRetries * 3) seconds."
             }
             # --- End of Wait Block ---
 
             "Fetching latest ViVeTool release info..." | Out-File -FilePath $vivelog -Append
-            $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/thebookisclosed/ViVe/releases/latest' -ErrorAction Stop
-            $vurl = $release.assets.browser_download_url | Where-Object { $_ -like '*zip*' } | Select-Object -First 1
-            
+            $release = Invoke-RestMethod -Uri
+            'https://api.github.com/repos/thebookisclosed/ViVe/releases/latest' -ErrorAction Stop
+            $vurl = $release.assets.browser_download_url | Where-Object { $_ -like '*zip*' } |
+            Select-Object -First 1
+
             "Downloading ViVeTool from: $vurl" | Out-File -FilePath $vivelog -Append
-            Invoke-WebRequest -Uri $vurl -OutFile "$env:TEMP\ViVe.zip" -UseBasicParsing -ErrorAction Stop
-            
+            Invoke-WebRequest -Uri $vurl -OutFile "$env:TEMP\ViVe.zip" -UseBasicParsing -ErrorAction
+            Stop
+
             $vpath = "$env:ProgramFiles\ViVeTool"
             "Extracting to: $vpath" | Out-File -FilePath $vivelog -Append
-            Expand-Archive -Path "$env:TEMP\ViVe.zip" -DestinationPath $vpath -Force -ErrorAction Stop
-            
-            $ids = @(47205210, 44239126, 46874360, 39562135, 48433719, 49402389, 49221331, 58988972, 59265307, 58989002, 57118881, 58381341, 58527096, 57156807, 57259990, 55805655, 58778013, 58383338, 59270880, 59203365, 57703775)
-            
+            Expand-Archive -Path "$env:TEMP\ViVe.zip" -DestinationPath $vpath -Force -ErrorAction
+            Stop
+
+            $ids = @(47205210, 44239126, 46874360, 39562135, 48433719, 49402389, 49221331, 58988972,
+            59265307, 58989002, 57118881, 58381341, 58527096, 57156807, 57259990, 55805655,
+            58778013, 58383338, 59270880, 59203365, 57703775)
+
             foreach ($id in $ids) {
-                $result = Start-Process -FilePath "$vpath\ViVeTool.exe" -ArgumentList "/enable /id:$id" -Wait -NoNewWindow -PassThru
-                "Applied ID: $id (ExitCode: $($result.ExitCode))" | Out-File -FilePath $vivelog -Append
+            $result = Start-Process -FilePath "$vpath\ViVeTool.exe" -ArgumentList "/enable /id:$id"
+            -Wait -NoNewWindow -PassThru
+            "Applied ID: $id (ExitCode: $($result.ExitCode))" | Out-File -FilePath $vivelog -Append
             }
             "ViVeTool configuration completed successfully." | Out-File -FilePath $vivelog -Append
-        } catch {
-            "ERROR: ViVeTool failed. Reason: $($_.Exception.Message)" | Out-File -FilePath $vivelog -Append
-        }
-    };
-    {
-        # 5. Run next unattend script
-        &amp; 'C:\Windows\Setup\Scripts\unattend-01.ps1';
-    };
-    {
-        # 6. Final cleanup
-        Remove-Item -LiteralPath @(
-          'C:\Windows\Panther\unattend.xml';
-          'C:\Windows\Panther\unattend-original.xml';
-          'C:\Windows\Setup\Scripts\Wifi.xml';
-        ) -Force -ErrorAction 'SilentlyContinue' -Verbose;
-    };
-);
+            } catch {
+            "ERROR: ViVeTool failed. Reason: $($_.Exception.Message)" | Out-File -FilePath $vivelog
+            -Append
+            }
+            };
+            {
+            # 5. Run next unattend script
+            &amp; 'C:\Windows\Setup\Scripts\unattend-01.ps1';
+            };
+            {
+            # 6. Final cleanup
+            Remove-Item -LiteralPath @(
+            'C:\Windows\Panther\unattend.xml';
+            'C:\Windows\Panther\unattend-original.xml';
+            'C:\Windows\Setup\Scripts\Wifi.xml';
+            ) -Force -ErrorAction 'SilentlyContinue' -Verbose;
+            };
+            );
 
-&amp; {
-  [float] $complete = 0;
-  [float] $increment = 100 / $scripts.Count;
-  foreach( $script in $scripts ) {
-    Write-Progress -Activity 'Running scripts to finalize your Windows installation. Do not close this window.' -PercentComplete $complete;
-    '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
-      $str = $script.ToString().Trim() -replace '\s+', ' ';
-      $max = 100;
-      if( $str.Length -le $max ) {
-        $str;
-      } else {
-        $str.Substring( 0, $max - 1 ) + '&#x2026;';
-      }
-    );
-    $start = [datetime]::Now;
-    &amp; $script;
-    '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start ).TotalMilliseconds;
-    "`r`n" * 3;
-    $complete += $increment;
-  }
-} *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt; "C:\Windows\Setup\Scripts\FirstLogon.log";
+            &amp; {
+            [float] $complete = 0;
+            [float] $increment = 100 / $scripts.Count;
+            foreach( $script in $scripts ) {
+            Write-Progress -Activity 'Running scripts to finalize your Windows installation. Do not
+            close this window.' -PercentComplete $complete;
+            '*** Will now execute command &#xAB;{0}&#xBB;.' -f $(
+            $str = $script.ToString().Trim() -replace '\s+', ' ';
+            $max = 100;
+            if( $str.Length -le $max ) {
+            $str;
+            } else {
+            $str.Substring( 0, $max - 1 ) + '&#x2026;';
+            }
+            );
+            $start = [datetime]::Now;
+            &amp; $script;
+            '*** Finished executing command after {0:0} ms.' -f [datetime]::Now.Subtract( $start
+            ).TotalMilliseconds;
+            "`r`n" * 3;
+            $complete += $increment;
+            }
+            } *&gt;&amp;1 | Out-String -Width 1KB -Stream &gt;&gt;
+            "C:\Windows\Setup\Scripts\FirstLogon.log";
         </File>
 	</Extensions>
 </unattend>
