@@ -28,33 +28,27 @@
 			<RunSynchronous>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD
-                        /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>2</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t
-                        REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>3</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD
-                        /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>4</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD
-                        /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>5</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t
-                        REG_DWORD /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>6</Order>
-					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD
-                        /d 1 /f</Path>
+					<Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD /d 1 /f</Path>
 				</RunSynchronousCommand>
 			</RunSynchronous>
 		</component>
@@ -70,15 +64,11 @@
 			<RunSynchronous>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>1</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -NoProfile -Command "$xml =
-                        [xml]::new(); $xml.Load('C:\Windows\Panther\unattend.xml'); $sb =
-                        [scriptblock]::Create( $xml.unattend.Extensions.ExtractScript );
-                        Invoke-Command -ScriptBlock $sb -ArgumentList $xml;"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -NoProfile -Command "$xml = [xml]::new(); $xml.Load('C:\Windows\Panther\unattend.xml'); $sb = [scriptblock]::Create( $xml.unattend.Extensions.ExtractScript ); Invoke-Command -ScriptBlock $sb -ArgumentList $xml;"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>2</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted"
-                        -NoProfile -File "C:\Windows\Setup\Scripts\Specialize.ps1"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\Specialize.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>3</Order>
@@ -86,13 +76,11 @@
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>4</Order>
-					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted"
-                        -NoProfile -File "C:\Windows\Setup\Scripts\DefaultUser.ps1"</Path>
+					<Path>powershell.exe -WindowStyle "Hidden" -ExecutionPolicy "Unrestricted" -NoProfile -File "C:\Windows\Setup\Scripts\DefaultUser.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>5</Order>
-					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -NoProfile
-                        -File "C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1"</Path>
+					<Path>powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -NoProfile -File "C:\Windows\Setup\Scripts\Specialize_Tweaks.ps1"</Path>
 				</RunSynchronousCommand>
 				<RunSynchronousCommand wcm:action="add">
 					<Order>6</Order>
@@ -549,8 +537,7 @@
 		<File path="C:\Windows\Setup\Scripts\Specialize.ps1">
             $scripts = @(
             {
-            reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t
-            REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\SYSTEM\Setup\MoSetup" /v AllowUpgradesWithUnsupportedTPMOrCPU /t REG_DWORD /d 1 /f;
             };
             {
             Remove-Item -LiteralPath 'C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start
@@ -563,8 +550,7 @@
             -Force -ErrorAction 'SilentlyContinue';
             };
             {
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v
-            ConfigureChatAutoInstall /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications" /v ConfigureChatAutoInstall /t REG_DWORD /d 0 /f;
             };
             {
             &amp; 'C:\Windows\Setup\Scripts\RemovePackages.ps1';
@@ -579,30 +565,21 @@
             net.exe accounts /maxpwage:UNLIMITED;
             };
             {
-            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v
-            VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /v VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v
-            SmartScreenEnabled /t REG_SZ /d "Off" /f;
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
-            ServiceEnabled /t REG_DWORD /d 0 /f;
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
-            NotifyMalicious /t REG_DWORD /d 0 /f;
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
-            NotifyPasswordReuse /t REG_DWORD /d 0 /f;
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v
-            NotifyUnsafeApp /t REG_DWORD /d 0 /f;
-            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray"
-            /v HideSystray /t REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v SmartScreenEnabled /t REG_SZ /d "Off" /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v ServiceEnabled /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyMalicious /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyPasswordReuse /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WTDS\Components" /v NotifyUnsafeApp /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Systray" /v HideSystray /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v
-            EnableLUA /t REG_DWORD /d 0 /f
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f
             };
             {
-            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t
-            REG_DWORD /d 1 /f
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
             };
             {
             Remove-Item -LiteralPath 'C:\Users\Public\Desktop\Microsoft Edge.lnk' -ErrorAction
@@ -613,37 +590,28 @@
             /failure:enable;
             };
             {
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v
-            ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f;
             };
             {
             Set-ExecutionPolicy -Scope 'LocalMachine' -ExecutionPolicy 'RemoteSigned' -Force;
             };
             {
-            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v
-            HiberbootEnabled /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD
-            /d 0 /f;
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v
-            "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v
-            "PreventDeviceEncryption" /t REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKLM\Software\Policies\Microsoft\Edge" /v HideFirstRunExperience /t
-            REG_DWORD /d 1 /f;
+            reg.exe add "HKLM\Software\Policies\Microsoft\Edge" /v HideFirstRunExperience /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v BackgroundModeEnabled
-            /t REG_DWORD /d 0 /f;
-            reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v StartupBoostEnabled
-            /t REG_DWORD /d 0 /f;
+            reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v BackgroundModeEnabled /t REG_DWORD /d 0 /f; reg.exe add "HKLM\Software\Policies\Microsoft\Edge\Recommended" /v StartupBoostEnabled /t REG_DWORD /d 0 /f;
             };
             {
             &amp; 'C:\Windows\Setup\Scripts\SetStartPins.ps1';
@@ -660,8 +628,7 @@
             try {
             $bytes = &amp; 'C:\Windows\Setup\Scripts\GetLockScreenImage.ps1';
             [System.IO.File]::WriteAllBytes( 'C:\Windows\Setup\Scripts\LockScreenImage', $bytes );
-            reg.exe add "HKLM\Software\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v
-            LockScreenImagePath /t REG_SZ /d "C:\Windows\Setup\Scripts\LockScreenImage" /f;
+            reg.exe add "HKLM\Software\Microsoft\Windows\CurrentVersion\PersonalizationCSP" /v LockScreenImagePath /t REG_SZ /d "C:\Windows\Setup\Scripts\LockScreenImage" /f;
             } catch {
             $_;
             }
@@ -711,25 +678,19 @@
             try {
             # Hide/Remove Network
             $networkCLSID = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
-            reg.exe delete
-            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-            reg.exe delete
-            reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
-            reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null
-            Log "Network CLSID processed: $networkCLSID"
+            reg.exe delete reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
+            reg.exe delete reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$networkCLSID" /f | Out-Null
+            reg.exe delete "HKU\DefaultUser\Software\Classes\CLSID\$networkCLSID" /f | Out-Null Log "Network CLSID processed: $networkCLSID"
 
             # Remove Gallery
             $galleryCLSID = "{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}"
-            reg.exe delete
-            reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
+            reg.exe delete reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$galleryCLSID" /f | Out-Null
             Log "Gallery CLSID removed: $galleryCLSID"
 
             # Hide Home via HiddenByDefault and remove WOW6432Node duplicate
             $homeCLSID = "{f874310e-b6b7-47dc-bc84-b9e6b38f5903}"
-            reg.exe add
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
-            reg.exe delete
-            reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
+            reg.exe add reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /v HiddenByDefault /t REG_DWORD /d 1 /f | Out-Null
+            reg.exe delete reg.exe delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace\$homeCLSID" /f | Out-Null
             Log "Home hidden via HiddenByDefault and WOW6432Node duplicate removed: $homeCLSID"
             }
             catch {
@@ -747,32 +708,25 @@
             }
 
             # 2. System-wide Explorer Defaults (This PC by default)
-            reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"
-            reg.exe add
+            reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT" reg.exe add
             reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
 			
 			# Ensure Details pane enabled for DefaultUser (applies to new profiles)
-			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /f
-			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
+			reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /f reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer" /v DetailsContainerSizer /t REG_BINARY /d 4A01000001000000000000007B040000 /f
             reg.exe unload "HKU\DefaultUser"
 
             # 3. Taskbar and Start Menu Tweaks
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            Start_TrackProgs /t REG_DWORD /d 1 /f
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Start_TrackProgs /t REG_DWORD /d 1 /f
 
             # 4. Desktop Icons (Remove Shortcut Arrows)
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29
-            /t REG_SZ /d "shell32.dll,-50" /f
+            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /t REG_SZ /d "shell32.dll,-50" /f
 
             # 5. System Personalization (No Lock Screen and No Blur)
-            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen
-            /t REG_DWORD /d 1 /f
-            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v
+            reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" /v NoLockScreen /t REG_DWORD /d 1 /f reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\System" /v
             DisableAcrylicBackgroundOnLogon /t REG_DWORD /d 1 /f
 
             # 6. Power Management and Storage Optimization
-            powercfg.exe /hibernate off
-            reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v
+            powercfg.exe /hibernate off reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v
             ShippedWithReserves /t REG_DWORD /d 0 /f
 
             "Finished Specialize_Tweaks.ps1 at $(Get-Date)" | Out-File -FilePath
@@ -957,12 +911,10 @@
 		<File path="C:\Windows\Setup\Scripts\DefaultUser.ps1">
             $scripts = @(
             {
-            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v
-            TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet
-            Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Internet Explorer\LowRegistry\Audio\PolicyConfig\PropertyStore" /f;
             };
             {
             Remove-ItemProperty -LiteralPath
@@ -970,52 +922,34 @@
             'OneDriveSetup' -Force -ErrorAction 'Continue';
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v
-            AppCaptureEnabled /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f;
             };
             {
             # Explorer Advanced: HideFileExt, Hidden, LastActiveClick, CompactMode
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            "HideFileExt" /t REG_DWORD /d 0 /f;
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            "Hidden" /t REG_DWORD /d 1 /f;
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            "LastActiveClick" /t REG_DWORD /d 1 /f;
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
-            "UseCompactMode" /t REG_DWORD /d 1 /f;
+             "HideFileExt" /t REG_DWORD /d 0 /f;
+             "Hidden" /t REG_DWORD /d 1 /f;
+             "LastActiveClick" /t REG_DWORD /d 1 /f;
+             "UseCompactMode" /t REG_DWORD /d 1 /f;
             };
             {
             # Preview Pane
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Modules\GlobalSettings\Sizer"
-            /v "ShowPreviewPane" /t REG_DWORD /d 1 /f;
+             /v "ShowPreviewPane" /t REG_DWORD /d 1 /f;
             };
             {
             # Hide Network from Sidebar
             $id = "{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}"
-            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id" /v
-            "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f;
-            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id\ShellFolder" /v "Attributes" /t
-            REG_DWORD /d 2954756196 /f;
+            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Classes\CLSID\$id\ShellFolder" /v "Attributes" /t REG_DWORD /d 2954756196 /f;
             };
             {
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
             ShowTaskViewButton /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenEnabled" /ve /t
-            REG_DWORD /d 0 /f;
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenPuaEnabled" /ve /t
-            REG_DWORD /d 0 /f;
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v
-            EnableWebContentEvaluation /t REG_DWORD /d 0 /f;
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v
-            PreventOverride /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenEnabled" /ve /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Edge\SmartScreenPuaEnabled" /ve /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v EnableWebContentEvaluation /t REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\AppHost" /v PreventOverride /t REG_DWORD /d 0 /f;
             };
             {
             $names = @(
@@ -1038,34 +972,25 @@
             'SystemPaneSuggestionsEnabled';
             );
             foreach( $name in $names ) {
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v
             $name /t REG_DWORD /d 0 /f;
             }
             };
             {
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v
             TaskbarAl /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v
-            DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f;
+            reg.exe add "HKU\DefaultUser\Software\Policies\Microsoft\Windows\Explorer" /v DisableSearchBoxSuggestions /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add
-            "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings"
-            /v TaskbarEndTask /t REG_DWORD /d 1 /f;
+             /v TaskbarEndTask /t REG_DWORD /d 1 /f;
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t
-            REG_DWORD /d 0 /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\DWM" /v ColorPrevalence /t REG_DWORD /d 0 /f;
             };
             {
-            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v
-            "UnattendedSetup" /t REG_SZ /d "powershell.exe -WindowStyle \""Hidden\""
-            -ExecutionPolicy \""Unrestricted\"" -NoProfile -File
-            \""C:\Windows\Setup\Scripts\UserOnce.ps1\""" /f;
+            reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v "UnattendedSetup" /t REG_SZ /d "powershell.exe -WindowStyle \""Hidden\"" -ExecutionPolicy \""Unrestricted\"" -NoProfile -File \""C:\Windows\Setup\Scripts\UserOnce.ps1\""" /f;
             };
             );
             &amp; {
